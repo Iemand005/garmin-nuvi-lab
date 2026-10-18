@@ -1,0 +1,12 @@
+[
+  {
+    "path": "artifacts/display-probe/LAB_01.JPG",
+    "bytes": 26726,
+    "sha256": "aab412bd05e000dc7d1016317d86f272353c557e92b90026d3e127900b555ff4"
+  },
+  {
+    "path": "artifacts/display-probe/LAB_02.JPG",
+    "bytes": 29868,
+    "sha256": "f744ab2d49d042d1d2516c8290cbc7989315c949209cbc4c1ff4a0fc35f86044"
+  }
+]

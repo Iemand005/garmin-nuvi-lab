@@ -1,0 +1,268 @@
+/* Raw touch candidate: exact stock logical-channel 0/1 drive and ADC sequence.
+ * Inherited clocks/directions only, bounded polls. No flash/filesystem access.
+ * Added peripheral stores are restricted by the offline audit.
+ */
+.syntax unified
+.arch armv5te
+.arm
+.section .text,"ax",%progbits
+.balign 4
+.global probe_start
+.equ STAGE, 0x10040000
+probe_start:
+    b entry
+    .word STAGE + (footer - probe_start)
+    .word STAGE + (hwid - probe_start)
+    .word STAGE + (version - probe_start)
+
+entry:
+    cmp r12, #12
+    bne park
+    /* Exact enabled TFT / palette-and-data path; no timing changes. */
+    ldr r0, =0xfffec000
+    ldr r1, [r0]
+    and r2, r1, #0x81
+    cmp r2, #0x81
+    bne park
+    tst r1, #0x00300000
+    bne park
+    ldr r2, [r0, #4]
+    ldr r3, =0x3ff
+    and r2, r2, r3
+    ldr r3, =319
+    cmp r2, r3
+    bne park
+    ldr r2, [r0, #8]
+    ldr r3, =0x3ff
+    and r2, r2, r3
+    cmp r2, #239
+    bne park
+
+    /* Snapshot programmed DMA B1 start/end using halfword accesses. */
+    ldr r7, =0xfffee3c0
+    ldrh r4, [r7, #8]
+    ldrh r0, [r7, #10]
+    orr r4, r4, r0, lsl #16
+    ldrh r5, [r7, #12]
+    ldrh r0, [r7, #14]
+    orr r5, r5, r0, lsl #16
+    ldr r0, =0x11f69f80
+    cmp r4, r0
+    beq known_buffer
+    ldr r0, =0x11fb4fc0
+    cmp r4, r0
+    bne park
+known_buffer:
+    sub r5, r5, r4
+    ldr r0, =0x2581e
+    cmp r5, r0
+    bne park
+    ldrh r0, [r4]
+    and r0, r0, #0x7000
+    cmp r0, #0x4000
+    bne park
+    /* Reject a source change while snapshotting. */
+    ldrh r0, [r7, #8]
+    ldrh r2, [r7, #10]
+    orr r0, r0, r2, lsl #16
+    cmp r0, r4
+    bne park
+
+    /* Inherited ADC configuration must already be initialized. */
+    ldr r0, =0xfffe6000
+    ldrh r1, [r0, #0x14]
+    tst r1, #1
+    beq park
+    /* Existing stock touchscreen drive pins must already be outputs. */
+    ldr r0, =0xfffbb400
+    ldr r1, [r0, #0x34]
+    tst r1, #0x0e
+    bne park
+    ldr r0, =0xfffbe400
+    ldr r1, [r0, #0x34]
+    ldr r2, =0x8010
+    tst r1, r2
+    bne park
+
+    /* Guarded source frame has 32-byte prefix; preserve that prefix. */
+    add r4, r4, #32
+    ldr r8, =STAGE + (screen - probe_start)
+    ldr r6, =76800
+copy_screen:
+    ldrh r0, [r8], #2
+    strh r0, [r4], #2
+    subs r6, r6, #1
+    bne copy_screen
+    /* r4 is end of pixel data; recover the validated prefix base. */
+    ldr r0, =153632
+    sub r4, r4, r0
+
+    /* r4 is the previously validated framebuffer prefix. */
+    add r9, r4, #32
+    mov r7, #0
+input_loop:
+    mov lr, pc
+    b select_0
+    mov r0, #0x8000
+    mov lr, pc
+    b sample_adc
+    mov r10, r0
+    mov lr, pc
+    b select_1
+    mov r0, #0x9000
+    mov lr, pc
+    b sample_adc
+    mov r11, r0
+    mov lr, pc
+    b select_0
+    b render_input
+
+/* Exact five stock stores at main 0x100dc2d8..0x100dc2f0. */
+select_0:
+    ldr r0, =0xfffbb4f0
+    mov r1, #2
+    str r1, [r0]
+    ldr r0, =0xfffbe4b0
+    mov r1, #0x8000
+    str r1, [r0]
+    mov r1, #0x10
+    str r1, [r0]
+    ldr r0, =0xfffbb4f0
+    mov r1, #4
+    str r1, [r0]
+    ldr r0, =0xfffbb4b0
+    mov r1, #8
+    str r1, [r0]
+    b settle
+
+/* Exact five stock stores at main 0x100dc316..0x100dc32c. */
+select_1:
+    ldr r0, =0xfffbb4b0
+    mov r1, #2
+    str r1, [r0]
+    ldr r0, =0xfffbe4f0
+    mov r1, #0x8000
+    str r1, [r0]
+    mov r1, #0x10
+    str r1, [r0]
+    ldr r0, =0xfffbb4b0
+    mov r1, #4
+    str r1, [r0]
+    mov r1, #8
+    str r1, [r0]
+settle:
+    /* Stock settling interval: timer decrement >= 0x2f1. */
+    ldr r0, =0xfffec700
+    ldr r1, [r0, #8]
+    ldr r3, =0x2f1
+    mov r12, #0x10000
+settle_poll:
+    ldr r2, [r0, #8]
+    sub r2, r1, r2
+    cmp r2, r3
+    bhs settled
+    subs r12, r12, #1
+    bne settle_poll
+    b failed
+settled:
+    bx lr
+
+/* Exact conversion command/status/result path at 0x100dcd36..0x100dcd60.
+ * r0=0x8000 or0x9000 selects physical ADC0/1 (both board tables agree).
+ */
+sample_adc:
+    ldr r1, =0xfffe6020
+    ldrh r2, [r1, #0x14]
+    strh r0, [r1]
+    ldr r2, =0xfffe6000
+    mov r12, #0x10000
+adc_poll:
+    ldrh r0, [r2, #0x18]
+    tst r0, #1
+    bne converted
+    subs r12, r12, #1
+    bne adc_poll
+    b failed
+converted:
+    ldrh r0, [r1, #0x14]
+    ldr r2, =0x3ff
+    and r0, r0, r2
+    bx lr
+
+render_input:
+    /* Two bars: x32..287, y112..123 and y160..171. */
+    ldr r0, =71744
+    add r4, r9, r0
+    mov r2, r10, lsr #2
+    mov r8, #0
+bar_begin:
+    mov r6, #12
+    ldr r0, =0x16d6
+    ldr r3, =0x2945
+bar_row:
+    mov r5, #0
+bar_pixel:
+    cmp r5, r2
+    strhlo r0, [r4], #2
+    strhhs r3, [r4], #2
+    add r5, r5, #1
+    cmp r5, #256
+    bne bar_pixel
+    add r4, r4, #128
+    subs r6, r6, #1
+    bne bar_row
+    cmp r8, #0
+    bne heartbeat
+    mov r8, #1
+    ldr r0, =102464
+    add r4, r9, r0
+    mov r2, r11, lsr #2
+    b bar_begin
+heartbeat:
+    eor r7, r7, #1
+    ldr r0, =0x16d6
+    cmp r7, #0
+    ldreq r0, =0x2945
+    b indicator
+failed:
+    /* Stop all further sampling, retain a red failure indicator. */
+    ldr r0, =0xf800
+indicator:
+    ldr r1, =12088
+    add r4, r9, r1
+    mov r6, #12
+indicator_row:
+    mov r5, #12
+indicator_pixel:
+    strh r0, [r4], #2
+    subs r5, r5, #1
+    bne indicator_pixel
+    add r4, r4, #616
+    subs r6, r6, #1
+    bne indicator_row
+    ldr r1, =0xf800
+    cmp r0, r1
+    beq park
+    mov r12, #0x100000
+input_delay:
+    subs r12, r12, #1
+    bne input_delay
+    b input_loop
+
+park:
+    b park
+    .ltorg
+    .balign 4
+hwid:
+    .hword 660
+version:
+    .hword 500
+footer:
+    .hword 0xa55a
+    .balign 4
+scratch:
+    .space 2048
+    .balign 4
+screen:
+    .incbin "experiments/touch/screen.rgb565"
+probe_end:
