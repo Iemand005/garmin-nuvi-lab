@@ -1,0 +1,11 @@
+# USB2 session-valid and live register diagnostics
+
+> Historical lab-stage notes. See the [current development guide](../../docs/development.md) for the working player and local setup.
+
+First USB test stayed orange after a physical Mac reconnect and Mac registry had no USB peripheral. Cause unproven. This revision adds one device-specific verified stock action:32bit read-modify-write OR0x40000 at OTG_CTRL0xfffb040c, matching main0x100ec664..66c and Linux OMAP pullup_enable. See analysis/usb/stock-otg-session-proof.json and research/usb/omap1-usb.h. No VBUS-drive/power bits changed; no reset/clock/PHY/direction writes. Guard first requires inheritedUSB0 transceiver mode3 in OTG_SYSCON1 and OTG_EN inSYSCON2, plus originalEP0=3001/UDCSYSCON1=0. Other inherited bits preserved.
+
+Retains firstUSBvendorprotocol/hosttool, buttons and cursor. New title NUVI / USB2. Left live hex readouts: CFG=UDC_SYSCON1, DEV=UDC_DEVSTAT, IRQ=accumulated UDC_IRQ_SRC bits, REQ=SETUP packets serviced(wraps16bit), OTG=upper16bits ofOTG_CTRL. USBstatus still redguardfailed/ambernotconfigured/greenconfigured. IRQ and REQ do not by themselves prove correct control responses. Readouts help distinguish electrical attach/session from packet handling. Counts/settings remainRAM-only.
+
+Build: make_usb2_probe.py then build_rectangle_probe.py --experiment usb2. Audit: audit_usb2_probe.py uses actualcompiledARM, whole-frame/readout/state comparisons and exactMMIOwrite constraints, old32protocolcases, twoUDCguards and twoOTGguards. It only models controller registers/FIFO and does not emulate USBsignalling/clocks/timing. Candidate173216bytes SHA2563ee0b0c703430f6ee8f1fa86812ff6754065c108697923a4031bec257d5f3ba5. Physical outcome pending. stage_usb2_probe.py accepts only known MacSD/UUID and priorUSB1 hash. No internalGarmin writes or firmwareupdate handler.
+
+Next: user moves SD from Garmin to Macreader(no hostvolumesmounted at lastcheck); verify/install/readback/eject, normal-eject Garmin first ifitremounts. StarttestwithUSBpower andknownsequence, photographscreen showing5readouts/bar. Agentchecks enumeration/status, sends321onlyafteridentityverified, watches touch. Do not repeatedly reconnect/reset without recordingresult. RemoveSDbefore recoveryRESET and normal-eject anyremountedstoragefirst.
