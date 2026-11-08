@@ -37,11 +37,12 @@ def main():
     lines = []
     for insn in md.disasm(code, addr):
         line = f'{insn.address:08x}: {insn.bytes.hex():<10} {insn.mnemonic:<8} {insn.op_str}'
-        # Annotate ARM LDR Rt,[pc,#imm] literal loads.
-        if not a.thumb and insn.mnemonic == 'ldr' and '[pc,' in insn.op_str:
+        # Annotate LDR Rt,[pc,#imm] literal-pool loads (ARM and Thumb).
+        if insn.mnemonic.startswith('ldr') and '[pc,' in insn.op_str:
+            base_pc = (insn.address + 4) & ~3 if a.thumb else insn.address + 8
             for op in insn.operands:
                 if op.type == 3:  # ARM_OP_MEM
-                    target = op.mem.disp
+                    target = base_pc + op.mem.disp
                     off = target - a.base
                     if 0 <= off <= len(image) - 4:
                         value = struct.unpack_from('<I', image, off)[0]
