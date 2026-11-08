@@ -208,10 +208,10 @@ def build():
                 raise SystemExit('instruction did not encode as one ARM word: ' + item[1])
             code.extend(encoding)
         elif item[0] == 'branch':
-            code.extend(struct.pack('<I', arm_branch(offset, STAGE + labels[item[2]], item[1])))
+            code.extend(struct.pack('<I', arm_branch(STAGE + offset, STAGE + labels[item[2]], item[1])))
         else:
             key = ('scratch',) if item[2] == 'scratch' else ('v', item[2])
-            code.extend(struct.pack('<I', arm_ldr_literal(offset, item[1], pool_slot[key])))
+            code.extend(struct.pack('<I', arm_ldr_literal(STAGE + offset, item[1], pool_slot[key])))
         offset += 4
     identity = struct.pack('<3H', HWID, SOFTWARE, FOOTER) + b'\0\0'
     pool = b''.join(struct.pack('<I', values[key]) for key in constants)
