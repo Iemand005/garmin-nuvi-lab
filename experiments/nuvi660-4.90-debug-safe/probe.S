@@ -63,12 +63,6 @@ known:
 
 main_loop:
     add r8, r8, #1
-    ldr r0, =0x500
-    cmp r8, r0
-    bhs do_exit
-    ldr r0, =BG
-    bl fill_screen
-
     /* row 0: title + frame */
     mov r2, #2
     mov r3, #2
