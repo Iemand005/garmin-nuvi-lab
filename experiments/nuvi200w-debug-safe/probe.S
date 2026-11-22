@@ -193,10 +193,10 @@ delay:
 
 do_exit:
     /* Best-effort: clear screen and park. No verified return-to-OS path. */
-    ldr r0, =0x0000
+    ldr r0, =0xF800
     bl fill_screen
     ldr r0, =str_exit
-    ldr r1, =FG2
+    ldr r1, =FG
     mov r2, #8
     mov r3, #120
     bl draw_string
@@ -366,5 +366,5 @@ str_l0:     .asciz "FFC000:"
 str_l4:     .asciz "FFC004:"
 str_note:   .asciz "IF THIS SHOWS, PAYLOAD/SCREEN OK."
 str_note2:  .asciz "NEXT: ADD SAFE TOUCH READS."
-str_exit:   .asciz "COUNTER 500 REACHED. SAFE STOP."
+str_exit:   .asciz "COUNTER 500 REACHED. SAFE STOP - RESET"
     .balign 4
