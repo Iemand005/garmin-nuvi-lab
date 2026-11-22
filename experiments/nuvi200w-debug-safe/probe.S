@@ -467,6 +467,118 @@ dh16_loop:
     subs r8, r8, #4
     bhs dh16_loop
     ldmfd sp!, {r4-r8, pc}
+sample_touch_raw:
+    stmfd sp!, {r7,r8,lr}
+    mov r4, #0
+    mov r5, #0
+    ldr r0, =0xfffe6000
+    ldrh r1, [r0, #0x14]
+    tst r1, #1
+    beq tr_fail
+    bl select_0
+    ldr r0, =0x8000
+    bl sample_adc
+    cmn r0, #1
+    beq tr_fail
+    mov r4, r0
+    bl select_1
+    ldr r0, =0x9000
+    bl sample_adc
+    cmn r0, #1
+    beq tr_fail
+    mov r5, r0
+    bl select_0
+    ldr r2, =0x340
+    cmp r4, #0x60
+    blo tr_chk_y
+    cmp r4, r2
+    blo tr_press
+tr_chk_y:
+    cmp r5, #0x60
+    blo tr_rel
+    cmp r5, r2
+    blo tr_press
+tr_rel:
+    mov r0, #0
+    ldmfd sp!, {r7,r8,pc}
+tr_press:
+    mov r0, #1
+    ldmfd sp!, {r7,r8,pc}
+tr_fail:
+    ldr r0, =0xffff
+    mov r4, r0
+    mov r5, r0
+    mov r0, #2
+    ldmfd sp!, {r7,r8,pc}
+
+select_0:
+    ldr r0, =0xfffbb4f0
+    mov r1, #2
+    str r1, [r0]
+    ldr r0, =0xfffbe4b0
+    mov r1, #0x8000
+    str r1, [r0]
+    mov r1, #0x10
+    str r1, [r0]
+    ldr r0, =0xfffbb4f0
+    mov r1, #4
+    str r1, [r0]
+    ldr r0, =0xfffbb4b0
+    mov r1, #8
+    str r1, [r0]
+    b settle
+
+select_1:
+    ldr r0, =0xfffbb4b0
+    mov r1, #2
+    str r1, [r0]
+    ldr r0, =0xfffbe4f0
+    mov r1, #0x8000
+    str r1, [r0]
+    mov r1, #0x10
+    str r1, [r0]
+    ldr r0, =0xfffbb4b0
+    mov r1, #4
+    str r1, [r0]
+    mov r1, #8
+    str r1, [r0]
+settle:
+    ldr r0, =0xfffec700
+    ldr r1, [r0, #8]
+    ldr r3, =0x2f1
+    mov r12, #0x10000
+settle_poll:
+    ldr r2, [r0, #8]
+    sub r2, r1, r2
+    cmp r2, r3
+    bhs settled
+    subs r12, r12, #1
+    bne settle_poll
+    ldr r0, =0xFFFF
+    bx lr
+settled:
+    bx lr
+
+sample_adc:
+    ldr r1, =0xfffe6020
+    ldrh r2, [r1, #0x14]
+    strh r0, [r1]
+    ldr r2, =0xfffe6000
+    mov r12, #0x10000
+adc_poll:
+    ldrh r0, [r2, #0x18]
+    tst r0, #1
+    bne converted
+    subs r12, r12, #1
+    bne adc_poll
+    ldr r0, =0xFFFF
+    bx lr
+converted:
+    ldrh r0, [r1, #0x14]
+    ldr r2, =0x3ff
+    and r0, r0, r2
+    bx lr
+
 park:
     b park
 
