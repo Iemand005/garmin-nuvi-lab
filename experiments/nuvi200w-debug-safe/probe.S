@@ -69,70 +69,44 @@ main_loop:
     ldr r0, =BG
     bl fill_screen
 
-    ldr r0, =str_title
+    /* row 0: title + frame */
+    mov r2, #2
+    mov r3, #2
     ldr r1, =FG2
-    mov r2, #8
-    mov r3, #8
+    ldr r0, =str_title
     bl draw_string
-
-    ldr r0, =str_safe
+    mov r2, #170
+    mov r3, #2
     ldr r1, =FG
-    mov r2, #8
-    mov r3, #24
-    bl draw_string
-
     ldr r0, =str_frame
-    ldr r1, =FG
-    mov r2, #8
-    mov r3, #48
     bl draw_string
     mov r0, r8
+    mov r2, #212
+    mov r3, #2
     ldr r1, =FG3
-    mov r2, #56
-    mov r3, #48
-    bl draw_hex32
+    bl draw_hex16
 
-    /* DMA base/start/end/len from live regs */
-    ldr r0, =str_dma
+    /* DMA */
+    mov r2, #2
+    mov r3, #12
     ldr r1, =FG2
-    mov r2, #8
-    mov r3, #72
-    bl draw_string
-
-    ldr r0, =str_dmas
-    ldr r1, =FG
-    mov r2, #8
-    mov r3, #88
+    ldr r0, =str_dma
     bl draw_string
     ldr r7, =DMA_BASE
     ldrh r0, [r7, #8]
     ldrh r1, [r7, #10]
     orr r0, r0, r1, lsl #16
+    mov r2, #38
+    mov r3, #12
     ldr r1, =FG3
-    mov r2, #80
-    mov r3, #88
     bl draw_hex32
-
-    ldr r0, =str_dmae
-    ldr r1, =FG
-    mov r2, #8
-    mov r3, #104
-    bl draw_string
-    ldr r7, =DMA_BASE
     ldrh r0, [r7, #12]
     ldrh r1, [r7, #14]
     orr r0, r0, r1, lsl #16
+    mov r2, #136
+    mov r3, #12
     ldr r1, =FG3
-    mov r2, #80
-    mov r3, #104
     bl draw_hex32
-
-    ldr r0, =str_dmal
-    ldr r1, =FG
-    mov r2, #8
-    mov r3, #120
-    bl draw_string
-    ldr r7, =DMA_BASE
     ldrh r4, [r7, #8]
     ldrh r0, [r7, #10]
     orr r4, r4, r0, lsl #16
@@ -140,127 +114,227 @@ main_loop:
     ldrh r0, [r7, #14]
     orr r5, r5, r0, lsl #16
     sub r0, r5, r4
+    mov r2, #234
+    mov r3, #12
     ldr r1, =FG3
-    mov r2, #80
-    mov r3, #120
     bl draw_hex32
 
-    /* LCD control regs (read-only) */
-    ldr r0, =str_lcd
+    /* LCD */
+    mov r2, #2
+    mov r3, #22
     ldr r1, =FG2
-    mov r2, #8
-    mov r3, #144
-    bl draw_string
-    ldr r0, =str_l0
-    ldr r1, =FG
-    mov r2, #8
-    mov r3, #160
+    ldr r0, =str_lcd
     bl draw_string
     ldr r0, =0xfffec000
     ldr r0, [r0]
+    mov r2, #38
+    mov r3, #22
     ldr r1, =FG3
-    mov r2, #80
-    mov r3, #160
     bl draw_hex32
-    ldr r0, =str_l4
-    ldr r1, =FG
-    mov r2, #8
-    mov r3, #176
-    bl draw_string
     ldr r0, =0xfffec004
     ldr r0, [r0]
+    mov r2, #136
+    mov r3, #22
     ldr r1, =FG3
-    mov r2, #80
-    mov r3, #176
+    bl draw_hex32
+    ldr r0, =0xfffec008
+    ldr r0, [r0]
+    mov r2, #234
+    mov r3, #22
+    ldr r1, =FG3
     bl draw_hex32
 
-        /* Read-only ADC/timer/GPIO candidates - no writes */
-    ldr r0, =str_adc
+    /* ADC regs read-only */
+    mov r2, #2
+    mov r3, #32
     ldr r1, =FG2
-    mov r2, #8
-    mov r3, #200
-    bl draw_string
-    ldr r0, =str_a14
-    ldr r1, =FG
-    mov r2, #8
-    mov r3, #216
+    ldr r0, =str_adc
     bl draw_string
     ldr r0, =0xfffe6014
     ldrh r0, [r0]
+    mov r2, #38
+    mov r3, #32
     ldr r1, =FG3
-    mov r2, #64
-    mov r3, #216
     bl draw_hex16
-    ldr r0, =str_a18
-    ldr r1, =FG
-    mov r2, #128
-    mov r3, #216
-    bl draw_string
     ldr r0, =0xfffe6018
     ldrh r0, [r0]
+    mov r2, #86
+    mov r3, #32
     ldr r1, =FG3
-    mov r2, #184
-    mov r3, #216
     bl draw_hex16
-    ldr r0, =str_a34
-    ldr r1, =FG
-    mov r2, #248
-    mov r3, #216
-    bl draw_string
     ldr r0, =0xfffe6034
     ldrh r0, [r0]
+    mov r2, #134
+    mov r3, #32
     ldr r1, =FG3
-    mov r2, #304
-    mov r3, #216
     bl draw_hex16
-
-    ldr r0, =str_tmr
-    ldr r1, =FG
-    mov r2, #8
-    mov r3, #232
-    bl draw_string
     ldr r0, =0xfffec708
     ldr r0, [r0]
+    mov r2, #182
+    mov r3, #32
     ldr r1, =FG3
-    mov r2, #64
-    mov r3, #232
     bl draw_hex32
 
-    ldr r0, =str_gpio
+    /* GPIO DATAIN candidates (read-only) */
+    mov r2, #2
+    mov r3, #42
     ldr r1, =FG2
-    mov r2, #8
-    mov r3, #248
+    ldr r0, =str_gpa
     bl draw_string
-    ldr r0, =str_ge
-    ldr r1, =FG
-    mov r2, #8
-    mov r3, #264
+    ldr r0, =0xfffbc430
+    ldr r0, [r0]
+    mov r2, #38
+    mov r3, #42
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffbcc30
+    ldr r0, [r0]
+    mov r2, #136
+    mov r3, #42
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffbdc30
+    ldr r0, [r0]
+    mov r2, #234
+    mov r3, #42
+    ldr r1, =FG3
+    bl draw_hex32
+
+    mov r2, #2
+    mov r3, #52
+    ldr r1, =FG2
+    ldr r0, =str_gpb
     bl draw_string
+    ldr r0, =0xfffbe430
+    ldr r0, [r0]
+    mov r2, #38
+    mov r3, #52
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffbec30
+    ldr r0, [r0]
+    mov r2, #136
+    mov r3, #52
+    ldr r1, =FG3
+    bl draw_hex32
     ldr r0, =0xfffbe42c
     ldr r0, [r0]
+    mov r2, #234
+    mov r3, #52
     ldr r1, =FG3
-    mov r2, #64
-    mov r3, #264
     bl draw_hex32
-    ldr r0, =str_gc
-    ldr r1, =FG
-    mov r2, #248
-    mov r3, #264
+
+    mov r2, #2
+    mov r3, #62
+    ldr r1, =FG2
+    ldr r0, =str_gpc
     bl draw_string
     ldr r0, =0xfffbec2c
     ldr r0, [r0]
+    mov r2, #38
+    mov r3, #62
     ldr r1, =FG3
-    mov r2, #304
-    mov r3, #264
     bl draw_hex32
-ldr r12, =0x00200000
+    ldr r0, =0xfffbc42c
+    ldr r0, [r0]
+    mov r2, #136
+    mov r3, #62
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffbcc2c
+    ldr r0, [r0]
+    mov r2, #234
+    mov r3, #62
+    ldr r1, =FG3
+    bl draw_hex32
+
+    /* Guarded touch sample (known 200 sequence, bounded timeouts) */
+    mov r2, #2
+    mov r3, #74
+    ldr r1, =FG2
+    ldr r0, =str_tch
+    bl draw_string
+    bl sample_touch_raw
+    mov r6, r0
+    mov r2, #38
+    mov r3, #74
+    ldr r1, =FG3
+    mov r0, r4
+    bl draw_hex16
+    mov r2, #86
+    mov r3, #74
+    ldr r1, =FG3
+    mov r0, r5
+    bl draw_hex16
+    mov r2, #134
+    mov r3, #74
+    ldr r1, =FG3
+    mov r0, r6
+    bl draw_hex16
+
+    /* more read-only regs: MPUIO/GPIO direction/data candidates */
+    mov r2, #2
+    mov r3, #86
+    ldr r1, =FG2
+    ldr r0, =str_dir
+    bl draw_string
+    ldr r0, =0xfffbe434
+    ldr r0, [r0]
+    mov r2, #38
+    mov r3, #86
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffbec34
+    ldr r0, [r0]
+    mov r2, #136
+    mov r3, #86
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffbc434
+    ldr r0, [r0]
+    mov r2, #234
+    mov r3, #86
+    ldr r1, =FG3
+    bl draw_hex32
+
+    mov r2, #2
+    mov r3, #96
+    ldr r1, =FG2
+    ldr r0, =str_mpu
+    bl draw_string
+    ldr r0, =0xfffb5008
+    ldr r0, [r0]
+    mov r2, #38
+    mov r3, #96
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffb5004
+    ldr r0, [r0]
+    mov r2, #136
+    mov r3, #96
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffb5014
+    ldr r0, [r0]
+    mov r2, #234
+    mov r3, #96
+    ldr r1, =FG3
+    bl draw_hex32
+
+    /* help */
+    mov r2, #2
+    mov r3, #110
+    ldr r1, =FG
+    ldr r0, =str_note
+    bl draw_string
+
+    ldr r12, =0x00100000
 delay:
     subs r12, r12, #1
     bne delay
     b main_loop
 
 do_exit:
-    /* Best-effort: clear screen and park. No verified return-to-OS path. */
     ldr r0, =0xF800
     bl fill_screen
     ldr r0, =str_exit
@@ -444,23 +518,17 @@ font:
     .byte 8,112,67,69,73,81,97,0,0,0,0,0,0,0,0,0
     .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-str_title:  .asciz "NUVI 200W DEBUG SAFE"
-str_safe:   .asciz "NO GPIO/ADC WRITES. READ-ONLY HUD."
-str_frame:  .asciz "FRAME:"
-str_dma:    .asciz "DMA REGS (READ ONLY)"
-str_dmas:   .asciz "START:"
-str_dmae:   .asciz "END:"
-str_dmal:   .asciz "LEN:"
-str_lcd:    .asciz "LCD REGS (READ ONLY)"
-str_l0:     .asciz "FFC000:"
-str_l4:     .asciz "FFC004:"
-str_adc:    .asciz "ADC/TMR/GPIO READ ONLY"
-str_a14:   .asciz "6014:"
-str_a18:   .asciz "6018:"
-str_a34:   .asciz "6034:"
-str_tmr:   .asciz "T708:"
-str_gpio:  .asciz "GPIO DIN CANDIDATES"
-str_ge:    .asciz "E42C:"
-str_gc:    .asciz "EC2C:"
-str_exit:   .asciz "COUNTER 500 REACHED. SAFE STOP - RESET"
+str_title:  .asciz "200W DBG"
+str_frame:  .asciz "FR:"
+str_dma:    .asciz "DMA"
+str_lcd:    .asciz "LCD"
+str_adc:    .asciz "ADC"
+str_gpa:    .asciz "GPA"
+str_gpb:    .asciz "GPB"
+str_gpc:    .asciz "GPC"
+str_tch:    .asciz "TCH"
+str_dir:    .asciz "DIR"
+str_mpu:    .asciz "MPU"
+str_note:   .asciz "TOGGLE PWR SW: WATCH GPIO/MPU BITS"
+str_exit:   .asciz "500 REACHED SAFE STOP RESET"
     .balign 4
