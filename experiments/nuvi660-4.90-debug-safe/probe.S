@@ -664,4 +664,11 @@ str_mpu:    .asciz "MPU"
 str_note:   .asciz "TOGGLE PWR SW: WATCH GPIO/MPU BITS"
 str_exit:   .asciz "500 REACHED. IDLE LOW-CPU. HOLD PWR SW."
 str_exit2:  .asciz "NO OS RETURN/POWEROFF PATH VERIFIED."
+str_chg:    .asciz "CHG"
+str_spi:    .asciz "SPI"
     .balign 4
+prev_gpc: .word 0
+prev_gpb: .word 0
+prev_mpu: .word 0
+prev_spi: .word 0
+
