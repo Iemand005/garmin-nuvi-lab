@@ -12,7 +12,8 @@ Both tested units now run a Mac-connected Spotify remote with live artwork, trac
 
 | Model | Hardware ID | Stock software | Current result |
 | --- | --- | --- | --- |
-| nüvi 200W | 0596 | 4.00 | Live display and native queued touch-button events |
+| nüvi 660 Euro | 0596 | 4.90 | Live display and native queued touch-button events |
+| nüvi 200W | UNKN | 4.00 | Live display and native queued touch-button events |
 | nüvi 200 | 0660 | 5.00 | Live display and native queued touch-button events |
 | nüvi 350 NA | 0476 | 6.20 | Live display, calibrated touch, and host-qualified playback controls |
 
