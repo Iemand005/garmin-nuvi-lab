@@ -248,7 +248,7 @@ main_loop:
     ldr r1, =FG3
     bl draw_hex32
 
-    /* Guarded touch sample (known 200 sequence, bounded timeouts) */
+    /* Touch: X ADC, Y ADC, pressed(0/1/2fail) */
     mov r2, #2
     mov r3, #74
     ldr r1, =FG2
@@ -258,15 +258,30 @@ main_loop:
     mov r6, r0
     mov r2, #38
     mov r3, #74
+    ldr r1, =FG
+    ldr r0, =str_tx
+    bl draw_string
+    mov r2, #56
+    mov r3, #74
     ldr r1, =FG3
     mov r0, r4
     bl draw_hex16
-    mov r2, #86
+    mov r2, #104
+    mov r3, #74
+    ldr r1, =FG
+    ldr r0, =str_ty
+    bl draw_string
+    mov r2, #122
     mov r3, #74
     ldr r1, =FG3
     mov r0, r5
     bl draw_hex16
-    mov r2, #134
+    mov r2, #170
+    mov r3, #74
+    ldr r1, =FG
+    ldr r0, =str_tp
+    bl draw_string
+    mov r2, #188
     mov r3, #74
     ldr r1, =FG3
     mov r0, r6
@@ -348,8 +363,10 @@ do_exit:
     mov r3, #132
     bl draw_string
 park_idle:
-    mov r0, #0
-    mcr p15, 0, r0, c7, c0, 4  /* WFI hint; harmless if unsupported/masked */
+    ldr r12, =0x40000
+pi_d:
+    subs r12, r12, #1
+    bne pi_d
     b park_idle
 
 fill_screen:
@@ -647,6 +664,9 @@ str_gpa:    .asciz "GPA"
 str_gpb:    .asciz "GPB"
 str_gpc:    .asciz "GPC"
 str_tch:    .asciz "TCH"
+str_tx:     .asciz "X"
+str_ty:     .asciz "Y"
+str_tp:     .asciz "P"
 str_dir:    .asciz "DIR"
 str_mpu:    .asciz "MPU"
 str_note:   .asciz "TOGGLE PWR SW: WATCH GPIO/MPU BITS"
