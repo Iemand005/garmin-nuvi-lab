@@ -106,6 +106,9 @@ wait_release:
     beq released
     subs r7, r7, #1
     bne wait_release
+    /* timeout while still pressed: keep held state, do not re-trigger */
+    mov r11, #1
+    b main_loop
 released:
     mov r11, #0
     b main_loop
@@ -165,11 +168,21 @@ sample_touch:
     beq sample_failed
     mov r5, r0                  /* adc1 */
     bl select_0
+    /* Heuristic: pressed when ADC value is in plausible touch range.
+     * Unverified on 200W; if it auto-cycles, threshold is wrong. */
     ldr r2, =PRESS_THR
+    cmp r4, #0x40
+    blo check_r5
     cmp r4, r2
-    blo is_pressed
+    bhs check_r5
+    b is_pressed
+check_r5:
+    cmp r5, #0x40
+    blo not_pressed_sample
     cmp r5, r2
-    blo is_pressed
+    bhs not_pressed_sample
+    b is_pressed
+not_pressed_sample:
     mov r0, #0
     bx r10
 is_pressed:
