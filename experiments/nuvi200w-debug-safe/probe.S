@@ -335,14 +335,22 @@ delay:
     b main_loop
 
 do_exit:
-    ldr r0, =0xF800
+    ldr r0, =BG
     bl fill_screen
     ldr r0, =str_exit
-    ldr r1, =FG
-    mov r2, #8
+    ldr r1, =FG2
+    mov r2, #2
     mov r3, #120
     bl draw_string
-    b park
+    ldr r0, =str_exit2
+    ldr r1, =FG
+    mov r2, #2
+    mov r3, #132
+    bl draw_string
+park_idle:
+    mov r0, #0
+    mcr p15, 0, r0, c7, c0, 4  /* WFI hint; harmless if unsupported/masked */
+    b park_idle
 
 fill_screen:
     mov r1, r9
@@ -642,5 +650,6 @@ str_tch:    .asciz "TCH"
 str_dir:    .asciz "DIR"
 str_mpu:    .asciz "MPU"
 str_note:   .asciz "TOGGLE PWR SW: WATCH GPIO/MPU BITS"
-str_exit:   .asciz "500 REACHED SAFE STOP RESET"
+str_exit:   .asciz "500 REACHED. IDLE LOW-CPU. HOLD PWR SW."
+str_exit2:  .asciz "NO OS RETURN/POWEROFF PATH VERIFIED."
     .balign 4
