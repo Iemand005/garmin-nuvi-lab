@@ -174,18 +174,86 @@ main_loop:
     mov r3, #176
     bl draw_hex32
 
-    ldr r0, =str_note
+        /* Read-only ADC/timer/GPIO candidates - no writes */
+    ldr r0, =str_adc
+    ldr r1, =FG2
+    mov r2, #8
+    mov r3, #200
+    bl draw_string
+    ldr r0, =str_a14
     ldr r1, =FG
     mov r2, #8
-    mov r3, #208
+    mov r3, #216
     bl draw_string
-    ldr r0, =str_note2
+    ldr r0, =0xfffe6014
+    ldrh r0, [r0]
+    ldr r1, =FG3
+    mov r2, #64
+    mov r3, #216
+    bl draw_hex16
+    ldr r0, =str_a18
     ldr r1, =FG
-    mov r2, #8
-    mov r3, #224
+    mov r2, #128
+    mov r3, #216
     bl draw_string
+    ldr r0, =0xfffe6018
+    ldrh r0, [r0]
+    ldr r1, =FG3
+    mov r2, #184
+    mov r3, #216
+    bl draw_hex16
+    ldr r0, =str_a34
+    ldr r1, =FG
+    mov r2, #248
+    mov r3, #216
+    bl draw_string
+    ldr r0, =0xfffe6034
+    ldrh r0, [r0]
+    ldr r1, =FG3
+    mov r2, #304
+    mov r3, #216
+    bl draw_hex16
 
-    ldr r12, =0x00200000
+    ldr r0, =str_tmr
+    ldr r1, =FG
+    mov r2, #8
+    mov r3, #232
+    bl draw_string
+    ldr r0, =0xfffec708
+    ldr r0, [r0]
+    ldr r1, =FG3
+    mov r2, #64
+    mov r3, #232
+    bl draw_hex32
+
+    ldr r0, =str_gpio
+    ldr r1, =FG2
+    mov r2, #8
+    mov r3, #248
+    bl draw_string
+    ldr r0, =str_ge
+    ldr r1, =FG
+    mov r2, #8
+    mov r3, #264
+    bl draw_string
+    ldr r0, =0xfffbe42c
+    ldr r0, [r0]
+    ldr r1, =FG3
+    mov r2, #64
+    mov r3, #264
+    bl draw_hex32
+    ldr r0, =str_gc
+    ldr r1, =FG
+    mov r2, #248
+    mov r3, #264
+    bl draw_string
+    ldr r0, =0xfffbec2c
+    ldr r0, [r0]
+    ldr r1, =FG3
+    mov r2, #304
+    mov r3, #264
+    bl draw_hex32
+ldr r12, =0x00200000
 delay:
     subs r12, r12, #1
     bne delay
@@ -303,6 +371,28 @@ dh32_loop:
     bhs dh32_loop
     ldmfd sp!, {r4-r8, pc}
 
+
+draw_hex16:
+    stmfd sp!, {r4-r8, lr}
+    mov r4, r0
+    mov r5, r1
+    mov r6, r2
+    mov r7, r3
+    mov r8, #12
+dh16_loop:
+    mov r0, r4, lsr r8
+    and r0, r0, #15
+    cmp r0, #10
+    addlo r0, r0, #48
+    addhs r0, r0, #55
+    mov r1, r5
+    mov r2, r6
+    mov r3, r7
+    bl draw_char
+    add r6, r6, #6
+    subs r8, r8, #4
+    bhs dh16_loop
+    ldmfd sp!, {r4-r8, pc}
 park:
     b park
 
@@ -364,7 +454,13 @@ str_dmal:   .asciz "LEN:"
 str_lcd:    .asciz "LCD REGS (READ ONLY)"
 str_l0:     .asciz "FFC000:"
 str_l4:     .asciz "FFC004:"
-str_note:   .asciz "IF THIS SHOWS, PAYLOAD/SCREEN OK."
-str_note2:  .asciz "NEXT: ADD SAFE TOUCH READS."
+str_adc:    .asciz "ADC/TMR/GPIO READ ONLY"
+str_a14:   .asciz "6014:"
+str_a18:   .asciz "6018:"
+str_a34:   .asciz "6034:"
+str_tmr:   .asciz "T708:"
+str_gpio:  .asciz "GPIO DIN CANDIDATES"
+str_ge:    .asciz "E42C:"
+str_gc:    .asciz "EC2C:"
 str_exit:   .asciz "COUNTER 500 REACHED. SAFE STOP - RESET"
     .balign 4
