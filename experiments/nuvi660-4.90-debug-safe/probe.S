@@ -408,16 +408,15 @@ dc_col:
     ldrb r11, [r8, r10]
     mov r12, #0
 dc_row:
-    mov r0, #1
-    tst r11, r0, lsl r12
-    beq dc_skip
     add r2, r6, r10
     mov r1, #6
     sub r3, r1, r12
     add r3, r7, r3  /* flip glyph vertically only */
-    mov r0, r5
+    mov r0, #1
+    tst r11, r0, lsl r12
+    moveq r0, #0x0000
+    movne r0, r5
     bl put_pixel
-dc_skip:
     add r12, r12, #1
     cmp r12, #7
     blt dc_row
