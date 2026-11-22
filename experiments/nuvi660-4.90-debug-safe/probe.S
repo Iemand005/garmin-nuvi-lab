@@ -63,7 +63,6 @@ known:
 
 main_loop:
     add r8, r8, #1
-    /* row 0: title + frame */
     mov r2, #2
     mov r3, #2
     ldr r1, =FG2
