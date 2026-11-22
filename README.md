@@ -2,6 +2,8 @@
 
 Repurpose vintage Garmin nüvi 200 and 350 navigators as programmable displays while keeping their original motherboards, LCDs, touchscreens, and enclosures.
 
+Project ported to work on Windows as well and extended hardware support to Nüvi 200W and testing 660 euro.
+
 Both tested units now run a Mac-connected Spotify remote with live artwork, track information, one progress bar, and touch controls with pressed states. Custom ARM code runs from RAM after an SD-card loader handoff; a Mac supplies the graphical interface and Spotify integration over a private USB protocol. No Raspberry Pi or replacement LCD was needed for this milestone.
 
 ![Generated player startup view](experiments/player/preview.png)
