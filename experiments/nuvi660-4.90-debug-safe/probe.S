@@ -241,25 +241,25 @@ main_loop:
     ldr r1, =FG3
     bl draw_hex32
 
-    /* Touch debug: read-only GPIO/SPI state */
+    /* Touch debug: read-only McSPI0 regs (no TX/RX read) */
     mov r2, #2
     mov r3, #72
     ldr r1, =FG2
     ldr r0, =str_tch
     bl draw_string
-    ldr r0, =0xfffbec2c      /* GPC data - flap/power bits seen */
+    ldr r0, =0xfffb0c14
     ldr r0, [r0]
     mov r2, #38
     mov r3, #72
     ldr r1, =FG3
     bl draw_hex32
-    ldr r0, =0xfffbe434      /* GPB mode/out - touch bit19 seen */
+    ldr r0, =0xfffb0c28
     ldr r0, [r0]
     mov r2, #136
     mov r3, #72
     ldr r1, =FG3
     bl draw_hex32
-    ldr r0, =0xfffb5008      /* MPUIO */
+    ldr r0, =0xfffb0c30
     ldr r0, [r0]
     mov r2, #234
     mov r3, #72
