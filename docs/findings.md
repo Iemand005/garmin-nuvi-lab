@@ -15,6 +15,8 @@ The project started with two thrift-store navigators and a Raspberry Pi 4. Both 
 
 The peripheral register layout and executable code establish ARM/Thumb and an OMAP1-style platform. Exact SoC and panel part numbers have not been confirmed by reading component markings. The firmware contains an embedded native execution environment; this is not a desktop OS with an established third-party application API.
 
+The nüvi 660 Euro (hardware ID 0596, software 4.90) has also been analyzed statically. Its logical UI is 480 × 272 and its touch path is a TSC2046-compatible serial driver on SPI at `0xfffb0c00`, not the 200's OMAP ADC sampling. The stock gesture task at `0x10066446` applies a 16.16 affine matrix, and the event builder at `0x10066366` posts native input events on the firmware event bus. The sampling, calibration, and event details are in [the 660 touch notes](nuvi660-touch.md). This is code analysis only; it has not been confirmed with a 660 hardware input test.
+
 ## What proved screen control
 
 1. Baseline JPEG patterns rendered through the stock picture viewer.

@@ -24,6 +24,7 @@ These are specific tested combinations, not a claim of compatibility with all n√
 - [Findings and approach comparison](docs/findings.md)
 - [Runtime architecture and USB protocol](docs/architecture.md)
 - [350 port and touch-controller fix](docs/nuvi350.md)
+- [660 touch sampling, calibration, and event injection](docs/nuvi660-touch.md)
 - [Build, test, and local setup](docs/development.md)
 - [Technical references](docs/references.md)
 
