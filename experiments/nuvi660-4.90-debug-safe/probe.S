@@ -213,21 +213,25 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_gpa
     bl draw_string
-    ldr r0, =0xfffbc430
-    ldr r0, [r0]
     mov r2, #38
     mov r3, #42
-    ldr r1, =FG3
-    bl draw_hex32
-    ldr r0, =0xfffbcc30
+    ldr r1, =FG2
+    ldr r0, =str_bc430
+    bl draw_string
+    ldr r0, =0xfffbc430
     ldr r0, [r0]
-    mov r2, #136
+    mov r2, #74
     mov r3, #42
     ldr r1, =FG3
     bl draw_hex32
-    ldr r0, =0xfffbdc30
+    mov r2, #170
+    mov r3, #42
+    ldr r1, =FG2
+    ldr r0, =str_cc30
+    bl draw_string
+    ldr r0, =0xfffbcc30
     ldr r0, [r0]
-    mov r2, #234
+    mov r2, #200
     mov r3, #42
     ldr r1, =FG3
     bl draw_hex32
@@ -237,21 +241,25 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_gpb
     bl draw_string
-    ldr r0, =0xfffbe430
-    ldr r0, [r0]
     mov r2, #38
     mov r3, #52
-    ldr r1, =FG3
-    bl draw_hex32
-    ldr r0, =0xfffbec30
+    ldr r1, =FG2
+    ldr r0, =str_be430
+    bl draw_string
+    ldr r0, =0xfffbe430
     ldr r0, [r0]
-    mov r2, #136
+    mov r2, #74
     mov r3, #52
     ldr r1, =FG3
     bl draw_hex32
-    ldr r0, =0xfffbe42c
+    mov r2, #170
+    mov r3, #52
+    ldr r1, =FG2
+    ldr r0, =str_bec30
+    bl draw_string
+    ldr r0, =0xfffbec30
     ldr r0, [r0]
-    mov r2, #234
+    mov r2, #206
     mov r3, #52
     ldr r1, =FG3
     bl draw_hex32
@@ -261,21 +269,25 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_gpc
     bl draw_string
-    ldr r0, =0xfffbec2c
-    ldr r0, [r0]
     mov r2, #38
     mov r3, #62
-    ldr r1, =FG3
-    bl draw_hex32
-    ldr r0, =0xfffbc42c
+    ldr r1, =FG2
+    ldr r0, =str_bec2c
+    bl draw_string
+    ldr r0, =0xfffbec2c
     ldr r0, [r0]
-    mov r2, #136
+    mov r2, #74
     mov r3, #62
     ldr r1, =FG3
     bl draw_hex32
-    ldr r0, =0xfffbcc2c
+    mov r2, #170
+    mov r3, #62
+    ldr r1, =FG2
+    ldr r0, =str_bc42c
+    bl draw_string
+    ldr r0, =0xfffbc42c
     ldr r0, [r0]
-    mov r2, #234
+    mov r2, #206
     mov r3, #62
     ldr r1, =FG3
     bl draw_hex32
