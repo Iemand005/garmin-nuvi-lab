@@ -241,28 +241,43 @@ main_loop:
     ldr r1, =FG3
     bl draw_hex32
 
-    /* Touch: guarded TSC2046 read via McSPI0 (660 4.90 app seq) */
+    /* Touch: X ADC, Y ADC, pressed(0/1/2fail) */
     mov r2, #2
-    mov r3, #72
+    mov r3, #74
     ldr r1, =FG2
     ldr r0, =str_tch
     bl draw_string
     bl sample_touch_raw
     mov r6, r0
-    mov r0, r4
     mov r2, #38
-    mov r3, #72
+    mov r3, #74
+    ldr r1, =FG
+    ldr r0, =str_tx
+    bl draw_string
+    mov r2, #56
+    mov r3, #74
     ldr r1, =FG3
+    mov r0, r4
     bl draw_hex16
+    mov r2, #104
+    mov r3, #74
+    ldr r1, =FG
+    ldr r0, =str_ty
+    bl draw_string
+    mov r2, #122
+    mov r3, #74
+    ldr r1, =FG3
     mov r0, r5
-    mov r2, #86
-    mov r3, #72
-    ldr r1, =FG3
     bl draw_hex16
-    mov r0, r6
-    mov r2, #134
-    mov r3, #72
+    mov r2, #170
+    mov r3, #74
+    ldr r1, =FG
+    ldr r0, =str_tp
+    bl draw_string
+    mov r2, #188
+    mov r3, #74
     ldr r1, =FG3
+    mov r0, r6
     bl draw_hex16
 
     /* more read-only regs: MPUIO/GPIO direction/data candidates */
@@ -470,147 +485,116 @@ dh16_loop:
     bhs dh16_loop
     ldmfd sp!, {r4-r8, pc}
 sample_touch_raw:
-    stmfd sp!, {r4-r11,lr}
-    /* Only attempt when PENIRQ-like bit19 is low on BE434 */
-    ldr r0, =0xfffbe434
-    ldr r0, [r0]
-    tst r0, #0x80000
-    movne r4, #0
-    movne r5, #0
-    movne r0, #0
-    ldmfdne sp!, {r4-r11,pc}
-
-    ldr r8, =0xfffb0c00
-    ldr r0, [r8, #0x14]
-    tst r0, #1
+    stmfd sp!, {r7,r8,lr}
+    mov r4, #0
+    mov r5, #0
+    ldr r0, =0xfffe6000
+    ldrh r1, [r0, #0x14]
+    tst r1, #1
     beq tr_fail
-
-    /* Save CH0CONF/CH0CTRL */
-    ldr r9, [r8, #0x2c]
-    ldr r10, [r8, #0x28]
-
-    /* X: cmd 0xD0 (12bit, ADC on, ref on) */
-    mov r0, #0xD0
-    bl spi_cmd8
-    cmp r0, #0
-    blt tr_fail_restore
-    mov r0, #0
-    bl spi_read16
-    cmp r0, #0
-    blt tr_fail_restore
+    bl select_0
+    ldr r0, =0x8000
+    bl sample_adc
+    cmn r0, #1
+    beq tr_fail
     mov r4, r0
-
-    /* Y: cmd 0x90 */
-    mov r0, #0x90
-    bl spi_cmd8
-    cmp r0, #0
-    blt tr_fail_restore
-    mov r0, #0
-    bl spi_read16
-    cmp r0, #0
-    blt tr_fail_restore
+    bl select_1
+    ldr r0, =0x9000
+    bl sample_adc
+    cmn r0, #1
+    beq tr_fail
     mov r5, r0
-
-    /* PD: cmd 0x00 */
-    mov r0, #0x00
-    bl spi_cmd8
-
-    /* Restore */
-    str r10, [r8, #0x28]
-    str r9, [r8, #0x2c]
+    bl select_0
+    ldr r2, =0x340
+    cmp r4, #0x60
+    blo tr_chk_y
+    cmp r4, r2
+    blo tr_press
+tr_chk_y:
+    cmp r5, #0x60
+    blo tr_rel
+    cmp r5, r2
+    blo tr_press
+tr_rel:
+    mov r0, #0
+    ldmfd sp!, {r7,r8,pc}
+tr_press:
     mov r0, #1
-    ldmfd sp!, {r4-r11,pc}
-
-tr_fail_restore:
-    str r10, [r8, #0x28]
-    str r9, [r8, #0x2c]
+    ldmfd sp!, {r7,r8,pc}
 tr_fail:
-    mov r4, #0xFFFF
-    mov r5, #0xFFFF
-    mov r0, #2
-    ldmfd sp!, {r4-r11,pc}
-
-spi_cmd8:
-    stmfd sp!, {r4-r7,lr}
+    ldr r0, =0xffff
     mov r4, r0
-    ldr r6, =0xfffb0c00
-    /* CH0CONF: 8-bit, D0, CLKD small, force single, POL=0 PHA=0 from app-ish */
-    ldr r0, [r6, #0x2c]
-    bic r0, r0, #0x1F         /* WL */
-    orr r0, r0, #0x07         /* 8-bit */
-    bic r0, r0, #(1<<20)      /* TURBO off */
-    orr r0, r0, #(1<<16)      /* FORCE */
-    str r0, [r6, #0x2c]
-    mov r0, #1
-    str r0, [r6, #0x28]       /* CH0CTRL enable */
-    ldr r2, =300000
-spi_cmd_txs:
-    ldr r1, [r6, #0x30]
-    tst r1, #2
-    bne spi_cmd_txs_ok
-    subs r2, r2, #1
-    bne spi_cmd_txs
-    b spi_err
-spi_cmd_txs_ok:
-    str r4, [r6, #0x38]
-    ldr r2, =300000
-spi_cmd_rxs:
-    ldr r1, [r6, #0x30]
-    tst r1, #1
-    bne spi_cmd_rxs_ok
-    subs r2, r2, #1
-    bne spi_cmd_rxs
-    b spi_err
-spi_cmd_rxs_ok:
-    ldr r0, [r6, #0x3c]
-    mov r0, #0
-    str r0, [r6, #0x28]
-    ldmfd sp!, {r4-r7,pc}
+    mov r5, r0
+    mov r0, #2
+    ldmfd sp!, {r7,r8,pc}
 
-spi_read16:
-    stmfd sp!, {r4-r7,lr}
-    ldr r6, =0xfffb0c00
-    ldr r0, [r6, #0x2c]
-    bic r0, r0, #0x1F
-    orr r0, r0, #0x0F         /* 16-bit */
-    orr r0, r0, #(1<<16)
-    str r0, [r6, #0x2c]
-    mov r0, #1
-    str r0, [r6, #0x28]
-    ldr r2, =300000
-spi_rd_txs:
-    ldr r1, [r6, #0x30]
-    tst r1, #2
-    bne spi_rd_txs_ok
-    subs r2, r2, #1
-    bne spi_rd_txs
-    b spi_err
-spi_rd_txs_ok:
-    mov r0, #0
-    str r0, [r6, #0x38]
-    ldr r2, =300000
-spi_rd_rxs:
-    ldr r1, [r6, #0x30]
-    tst r1, #1
-    bne spi_rd_rxs_ok
-    subs r2, r2, #1
-    bne spi_rd_rxs
-    b spi_err
-spi_rd_rxs_ok:
-    ldr r0, [r6, #0x3c]
-    mov r1, #0
-    str r1, [r6, #0x28]
-    mov r0, r0, lsr #3
-    ldr r1, =0x0FFF
-    and r0, r0, r1
-    ldmfd sp!, {r4-r7,pc}
+select_0:
+    ldr r0, =0xfffbb4f0
+    mov r1, #2
+    str r1, [r0]
+    ldr r0, =0xfffbe4b0
+    mov r1, #0x8000
+    str r1, [r0]
+    mov r1, #0x10
+    str r1, [r0]
+    ldr r0, =0xfffbb4f0
+    mov r1, #4
+    str r1, [r0]
+    ldr r0, =0xfffbb4b0
+    mov r1, #8
+    str r1, [r0]
+    b settle
 
-spi_err:
-    mov r0, #0
-    str r0, [r6, #0x28]
-    mvn r0, #0
-    ldmfd sp!, {r4-r7,pc}
+select_1:
+    ldr r0, =0xfffbb4b0
+    mov r1, #2
+    str r1, [r0]
+    ldr r0, =0xfffbe4f0
+    mov r1, #0x8000
+    str r1, [r0]
+    mov r1, #0x10
+    str r1, [r0]
+    ldr r0, =0xfffbb4b0
+    mov r1, #4
+    str r1, [r0]
+    mov r1, #8
+    str r1, [r0]
+settle:
+    ldr r0, =0xfffec700
+    ldr r1, [r0, #8]
+    ldr r3, =0x2f1
+    mov r12, #0x10000
+settle_poll:
+    ldr r2, [r0, #8]
+    sub r2, r1, r2
+    cmp r2, r3
+    bhs settled
+    subs r12, r12, #1
+    bne settle_poll
+    ldr r0, =0xFFFF
+    bx lr
+settled:
+    bx lr
 
+sample_adc:
+    ldr r1, =0xfffe6020
+    ldrh r2, [r1, #0x14]
+    strh r0, [r1]
+    ldr r2, =0xfffe6000
+    mov r12, #0x10000
+adc_poll:
+    ldrh r0, [r2, #0x18]
+    tst r0, #1
+    bne converted
+    subs r12, r12, #1
+    bne adc_poll
+    ldr r0, =0xFFFF
+    bx lr
+converted:
+    ldrh r0, [r1, #0x14]
+    ldr r2, =0x3ff
+    and r0, r0, r2
+    bx lr
 
 park:
     b park
