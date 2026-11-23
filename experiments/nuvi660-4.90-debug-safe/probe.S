@@ -85,36 +85,21 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_dma
     bl draw_string
-    mov r2, #38
-    mov r3, #12
-    ldr r1, =FG2
-    ldr r0, =str_ds
-    bl draw_string
     ldr r7, =DMA_BASE
     ldrh r0, [r7, #8]
     ldrh r1, [r7, #10]
     orr r0, r0, r1, lsl #16
-    mov r2, #50
+    mov r2, #38
     mov r3, #12
     ldr r1, =FG3
     bl draw_hex32
-    mov r2, #146
-    mov r3, #12
-    ldr r1, =FG2
-    ldr r0, =str_de
-    bl draw_string
     ldrh r0, [r7, #12]
     ldrh r1, [r7, #14]
     orr r0, r0, r1, lsl #16
-    mov r2, #158
+    mov r2, #136
     mov r3, #12
     ldr r1, =FG3
     bl draw_hex32
-    mov r2, #254
-    mov r3, #12
-    ldr r1, =FG2
-    ldr r0, =str_dl
-    bl draw_string
     ldrh r4, [r7, #8]
     ldrh r0, [r7, #10]
     orr r4, r4, r0, lsl #16
@@ -122,7 +107,7 @@ main_loop:
     ldrh r0, [r7, #14]
     orr r5, r5, r0, lsl #16
     sub r0, r5, r4
-    mov r2, #266
+    mov r2, #234
     mov r3, #12
     ldr r1, =FG3
     bl draw_hex32
@@ -133,25 +118,21 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_lcd
     bl draw_string
-    mov r2, #38
-    mov r3, #22
-    ldr r1, =FG2
-    ldr r0, =str_l0
-    bl draw_string
     ldr r0, =0xfffec000
     ldr r0, [r0]
-    mov r2, #68
+    mov r2, #38
     mov r3, #22
     ldr r1, =FG3
     bl draw_hex32
-    mov r2, #164
-    mov r3, #22
-    ldr r1, =FG2
-    ldr r0, =str_l4
-    bl draw_string
     ldr r0, =0xfffec004
     ldr r0, [r0]
-    mov r2, #194
+    mov r2, #136
+    mov r3, #22
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffec008
+    ldr r0, [r0]
+    mov r2, #234
     mov r3, #22
     ldr r1, =FG3
     bl draw_hex32
@@ -162,47 +143,27 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_adc
     bl draw_string
-    mov r2, #38
-    mov r3, #32
-    ldr r1, =FG2
-    ldr r0, =str_a14
-    bl draw_string
     ldr r0, =0xfffe6014
     ldrh r0, [r0]
-    mov r2, #68
+    mov r2, #38
     mov r3, #32
     ldr r1, =FG3
     bl draw_hex16
-    mov r2, #116
-    mov r3, #32
-    ldr r1, =FG2
-    ldr r0, =str_a18
-    bl draw_string
     ldr r0, =0xfffe6018
     ldrh r0, [r0]
-    mov r2, #146
+    mov r2, #86
     mov r3, #32
     ldr r1, =FG3
     bl draw_hex16
-    mov r2, #194
-    mov r3, #32
-    ldr r1, =FG2
-    ldr r0, =str_a34
-    bl draw_string
     ldr r0, =0xfffe6034
     ldrh r0, [r0]
-    mov r2, #224
+    mov r2, #134
     mov r3, #32
     ldr r1, =FG3
     bl draw_hex16
-    mov r2, #272
-    mov r3, #32
-    ldr r1, =FG2
-    ldr r0, =str_tm
-    bl draw_string
     ldr r0, =0xfffec708
     ldr r0, [r0]
-    mov r2, #302
+    mov r2, #182
     mov r3, #32
     ldr r1, =FG3
     bl draw_hex32
@@ -213,25 +174,21 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_gpa
     bl draw_string
-    mov r2, #38
-    mov r3, #42
-    ldr r1, =FG2
-    ldr r0, =str_bc430
-    bl draw_string
     ldr r0, =0xfffbc430
     ldr r0, [r0]
-    mov r2, #74
+    mov r2, #38
     mov r3, #42
     ldr r1, =FG3
     bl draw_hex32
-    mov r2, #170
-    mov r3, #42
-    ldr r1, =FG2
-    ldr r0, =str_cc30
-    bl draw_string
     ldr r0, =0xfffbcc30
     ldr r0, [r0]
-    mov r2, #200
+    mov r2, #136
+    mov r3, #42
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffbdc30
+    ldr r0, [r0]
+    mov r2, #234
     mov r3, #42
     ldr r1, =FG3
     bl draw_hex32
@@ -241,25 +198,21 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_gpb
     bl draw_string
-    mov r2, #38
-    mov r3, #52
-    ldr r1, =FG2
-    ldr r0, =str_be430
-    bl draw_string
     ldr r0, =0xfffbe430
     ldr r0, [r0]
-    mov r2, #74
+    mov r2, #38
     mov r3, #52
     ldr r1, =FG3
     bl draw_hex32
-    mov r2, #170
-    mov r3, #52
-    ldr r1, =FG2
-    ldr r0, =str_bec30
-    bl draw_string
     ldr r0, =0xfffbec30
     ldr r0, [r0]
-    mov r2, #206
+    mov r2, #136
+    mov r3, #52
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffbe42c
+    ldr r0, [r0]
+    mov r2, #234
     mov r3, #52
     ldr r1, =FG3
     bl draw_hex32
@@ -269,25 +222,21 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_gpc
     bl draw_string
-    mov r2, #38
-    mov r3, #62
-    ldr r1, =FG2
-    ldr r0, =str_bec2c
-    bl draw_string
     ldr r0, =0xfffbec2c
     ldr r0, [r0]
-    mov r2, #74
+    mov r2, #38
     mov r3, #62
     ldr r1, =FG3
     bl draw_hex32
-    mov r2, #170
-    mov r3, #62
-    ldr r1, =FG2
-    ldr r0, =str_bc42c
-    bl draw_string
     ldr r0, =0xfffbc42c
     ldr r0, [r0]
-    mov r2, #206
+    mov r2, #136
+    mov r3, #62
+    ldr r1, =FG3
+    bl draw_hex32
+    ldr r0, =0xfffbcc2c
+    ldr r0, [r0]
+    mov r2, #234
     mov r3, #62
     ldr r1, =FG3
     bl draw_hex32
@@ -701,34 +650,17 @@ font:
 str_title:  .asciz "660 490"
 str_frame:  .asciz "FR:"
 str_dma:    .asciz "DMA"
-str_ds:     .asciz "S"
-str_de:     .asciz "E"
-str_dl:     .asciz "L"
 str_lcd:    .asciz "LCD"
-str_l0:     .asciz "C000"
-str_l4:     .asciz "C004"
 str_adc:    .asciz "ADC"
-str_a14:    .asciz "6014"
-str_a18:    .asciz "6018"
-str_a34:    .asciz "6034"
-str_tm:     .asciz "TMR"
 str_gpa:    .asciz "GPA"
-str_bc430:  .asciz "BC430"
-str_cc30:   .asciz "CC30"
 str_gpb:    .asciz "GPB"
-str_be430:  .asciz "BE430"
-str_bec30:  .asciz "BEC30"
 str_gpc:    .asciz "GPC"
-str_bec2c:  .asciz "BEC2C"
-str_bc42c:  .asciz "BC42C"
 str_tch:    .asciz "TCH"
 str_tx:     .asciz "X"
 str_ty:     .asciz "Y"
 str_tp:     .asciz "P"
 str_dir:    .asciz "DIR"
 str_mpu:    .asciz "MPU"
-str_fb08:   .asciz "5008"
-str_fb48:   .asciz "5048"
 str_note:   .asciz "TOGGLE PWR SW: WATCH GPIO/MPU BITS"
 str_exit:   .asciz "500 REACHED. IDLE LOW-CPU. HOLD PWR SW."
 str_exit2:  .asciz "NO OS RETURN/POWEROFF PATH VERIFIED."
