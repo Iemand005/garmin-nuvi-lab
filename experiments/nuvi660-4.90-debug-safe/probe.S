@@ -85,36 +85,21 @@ main_loop:
     ldr r1, =FG2
     ldr r0, =str_dma
     bl draw_string
-    mov r2, #38
-    mov r3, #12
-    ldr r1, =FG2
-    ldr r0, =str_ds
-    bl draw_string
     ldr r7, =DMA_BASE
     ldrh r0, [r7, #8]
     ldrh r1, [r7, #10]
     orr r0, r0, r1, lsl #16
-    mov r2, #50
+    mov r2, #38
     mov r3, #12
     ldr r1, =FG3
     bl draw_hex32
-    mov r2, #146
-    mov r3, #12
-    ldr r1, =FG2
-    ldr r0, =str_de
-    bl draw_string
     ldrh r0, [r7, #12]
     ldrh r1, [r7, #14]
     orr r0, r0, r1, lsl #16
-    mov r2, #158
+    mov r2, #136
     mov r3, #12
     ldr r1, =FG3
     bl draw_hex32
-    mov r2, #254
-    mov r3, #12
-    ldr r1, =FG2
-    ldr r0, =str_dl
-    bl draw_string
     ldrh r4, [r7, #8]
     ldrh r0, [r7, #10]
     orr r4, r4, r0, lsl #16
@@ -122,7 +107,7 @@ main_loop:
     ldrh r0, [r7, #14]
     orr r5, r5, r0, lsl #16
     sub r0, r5, r4
-    mov r2, #266
+    mov r2, #234
     mov r3, #12
     ldr r1, =FG3
     bl draw_hex32
@@ -665,34 +650,17 @@ font:
 str_title:  .asciz "660 490"
 str_frame:  .asciz "FR:"
 str_dma:    .asciz "DMA"
-str_ds:     .asciz "S"
-str_de:     .asciz "E"
-str_dl:     .asciz "L"
 str_lcd:    .asciz "LCD"
-str_l0:     .asciz "C000"
-str_l4:     .asciz "C004"
 str_adc:    .asciz "ADC"
-str_a14:    .asciz "6014"
-str_a18:    .asciz "6018"
-str_a34:    .asciz "6034"
-str_tm:     .asciz "TMR"
 str_gpa:    .asciz "GPA"
-str_bc430:  .asciz "BC430"
-str_cc30:   .asciz "CC30"
 str_gpb:    .asciz "GPB"
-str_be430:  .asciz "BE430"
-str_bec30:  .asciz "BEC30"
 str_gpc:    .asciz "GPC"
-str_bec2c:  .asciz "BEC2C"
-str_bc42c:  .asciz "BC42C"
 str_tch:    .asciz "TCH"
 str_tx:     .asciz "X"
 str_ty:     .asciz "Y"
 str_tp:     .asciz "P"
 str_dir:    .asciz "DIR"
 str_mpu:    .asciz "MPU"
-str_fb08:   .asciz "5008"
-str_fb48:   .asciz "5048"
 str_note:   .asciz "TOGGLE PWR SW: WATCH GPIO/MPU BITS"
 str_exit:   .asciz "500 REACHED. IDLE LOW-CPU. HOLD PWR SW."
 str_exit2:  .asciz "NO OS RETURN/POWEROFF PATH VERIFIED."
