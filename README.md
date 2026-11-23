@@ -16,8 +16,9 @@ Both tested units now run a Mac-connected Spotify remote with live artwork, trac
 | nüvi 200W | 0737 | 4.00 | Live display and native queued touch-button events |
 | nüvi 200 | 0660 | 5.00 | Live display and native queued touch-button events |
 | nüvi 350 NA | 0476 | 6.20 | Live display, calibrated touch, and host-qualified playback controls |
+| nüvi 52LM | 1613 | 3.30 | HWID confirmed; SD `ldr.bin` path templates present in 3.40/4.00 firmware; no runtime port yet |
 
-These are specific tested combinations, not a claim of compatibility with all nüvi devices. The 350 needs its own RAM entry, framebuffer packing, and touch driver; do not rename the 200 binary and load it on the 350.
+These are specific tested combinations, not a claim of compatibility with all nüvi devices. The 350 needs its own RAM entry, framebuffer packing, and touch driver; do not rename the 200 binary and load it on the 350. The 52LM entry records firmware-path analysis only; no SD payload has been run or handoff validated on that unit.
 
 ## Read first
 

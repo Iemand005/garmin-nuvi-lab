@@ -19,6 +19,8 @@ while off < len(b):
     if off + 4 > len(b):
         raise SystemExit('Truncated record header at ' + hex(off))
     ident, size = struct.unpack_from('<HH', b, off)
+    if ident == 0xffff and size == 0:
+        break
     end = off + 4 + size
     if end > len(b):
         raise SystemExit('Truncated payload at ' + hex(off))
@@ -35,6 +37,7 @@ while off < len(b):
 summary = dict(input=str(a.input), bytes=len(b),
                sha256=hashlib.sha256(b).hexdigest(),
                consumed_exactly=(off == len(b)),
+               trailing_bytes=len(b) - off,
                record_count=len(records),
                counts=dict(collections.Counter(r['id'] for r in records)),
                records=records, extracted={})
