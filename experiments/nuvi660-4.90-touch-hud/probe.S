@@ -62,6 +62,7 @@ known:
     mov r8, #0
 
 main_loop:
+    b touch_hud_init
     add r8, r8, #1
     mov r2, #2
     mov r3, #2
@@ -578,6 +579,458 @@ converted:
     and r0, r0, r2
     bx lr
 
+touch_hud_init:
+    ldr r0, =BG
+    bl fill_screen
+
+    ldr r0, =str_title
+    ldr r1, =FG2
+    mov r2, #2
+    mov r3, #2
+    bl draw_string
+
+    ldr r0, =str_stat
+    ldr r1, =FG
+    mov r2, #2
+    mov r3, #14
+    bl draw_string
+    ldr r0, =str_pen
+    ldr r1, =FG
+    mov r2, #120
+    mov r3, #14
+    bl draw_string
+    ldr r0, =str_smp
+    ldr r1, =FG
+    mov r2, #240
+    mov r3, #14
+    bl draw_string
+
+    ldr r0, =str_tx
+    ldr r1, =FG
+    mov r2, #2
+    mov r3, #26
+    bl draw_string
+    ldr r0, =str_ty
+    ldr r1, =FG
+    mov r2, #120
+    mov r3, #26
+    bl draw_string
+    ldr r0, =str_z1
+    ldr r1, =FG
+    mov r2, #240
+    mov r3, #26
+    bl draw_string
+    ldr r0, =str_z2
+    ldr r1, =FG
+    mov r2, #360
+    mov r3, #26
+    bl draw_string
+
+    ldr r0, =str_cx
+    ldr r1, =FG2
+    mov r2, #2
+    mov r3, #38
+    bl draw_string
+    ldr r0, =str_cy
+    ldr r1, =FG2
+    mov r2, #120
+    mov r3, #38
+    bl draw_string
+    ldr r0, =str_tp
+    ldr r1, =FG3
+    mov r2, #240
+    mov r3, #38
+    bl draw_string
+
+    ldr r0, =str_cfg
+    ldr r1, =FG3
+    mov r2, #2
+    mov r3, #50
+    bl draw_string
+    ldr r0, =str_ctl
+    ldr r1, =FG3
+    mov r2, #120
+    mov r3, #50
+    bl draw_string
+    ldr r0, =str_spi
+    ldr r1, =FG3
+    mov r2, #240
+    mov r3, #50
+    bl draw_string
+
+    ldr r0, =str_penr
+    ldr r1, =FG3
+    mov r2, #2
+    mov r3, #62
+    bl draw_string
+
+    ldr r0, =str_note2
+    ldr r1, =FG
+    mov r2, #2
+    mov r3, #76
+    bl draw_string
+    ldr r0, =str_note3
+    ldr r1, =FG3
+    mov r2, #2
+    mov r3, #88
+    bl draw_string
+    b touch_hud_loop
+
+touch_hud_loop:
+    ldr r10, =sample_count
+    ldr r0, [r10]
+    add r0, r0, #1
+    str r0, [r10]
+    bl sample_touch660
+    bl update_touch_hud
+    ldr r12, =0x00080000
+th_delay:
+    subs r12, r12, #1
+    bne th_delay
+    b touch_hud_loop
+
+update_touch_hud:
+    stmfd sp!, {r4-r10, lr}
+    ldr r10, =touch_vals
+
+    ldrh r0, [r10, #0]
+    ldr r1, =FG3
+    mov r2, #26
+    mov r3, #14
+    bl draw_hex16
+
+    ldrh r0, [r10, #0x20]
+    ldr r1, =FG2
+    mov r2, #138
+    mov r3, #14
+    bl draw_hex16
+
+    ldr r10, =sample_count
+    ldr r0, [r10]
+    ldr r1, =FG3
+    mov r2, #258
+    mov r3, #14
+    bl draw_hex16
+
+    ldr r10, =touch_vals
+    ldrh r0, [r10, #2]
+    ldr r1, =FG
+    mov r2, #8
+    mov r3, #26
+    bl draw_hex16
+    ldrh r0, [r10, #4]
+    ldr r1, =FG
+    mov r2, #126
+    mov r3, #26
+    bl draw_hex16
+    ldrh r0, [r10, #6]
+    ldr r1, =FG
+    mov r2, #252
+    mov r3, #26
+    bl draw_hex16
+    ldrh r0, [r10, #8]
+    ldr r1, =FG
+    mov r2, #372
+    mov r3, #26
+    bl draw_hex16
+
+    ldrh r0, [r10, #0xc]
+    ldr r1, =FG2
+    mov r2, #14
+    mov r3, #38
+    bl draw_hex16
+    ldrh r0, [r10, #0xe]
+    ldr r1, =FG2
+    mov r2, #132
+    mov r3, #38
+    bl draw_hex16
+    ldrh r0, [r10, #0xa]
+    ldr r1, =FG3
+    mov r2, #246
+    mov r3, #38
+    bl draw_hex16
+
+    ldr r0, [r10, #0x14]
+    ldr r1, =FG3
+    mov r2, #20
+    mov r3, #50
+    bl draw_hex32
+    ldr r0, [r10, #0x18]
+    ldr r1, =FG3
+    mov r2, #138
+    mov r3, #50
+    bl draw_hex32
+    ldr r0, [r10, #0x1c]
+    ldr r1, =FG3
+    mov r2, #258
+    mov r3, #50
+    bl draw_hex32
+
+    ldr r0, [r10, #0x10]
+    ldr r1, =FG3
+    mov r2, #26
+    mov r3, #62
+    bl draw_hex32
+
+    ldmfd sp!, {r4-r10, pc}
+
+sample_touch660:
+    stmfd sp!, {r4-r11, lr}
+    ldr r10, =touch_vals
+    mov r0, #0
+    strh r0, [r10, #0]
+    strh r0, [r10, #2]
+    strh r0, [r10, #4]
+    strh r0, [r10, #6]
+    strh r0, [r10, #8]
+    strh r0, [r10, #0xa]
+    strh r0, [r10, #0xc]
+    strh r0, [r10, #0xe]
+    strh r0, [r10, #0x20]
+
+    ldr r0, =0xfffbe42c
+    ldr r0, [r0]
+    str r0, [r10, #0x10]
+    tst r0, #0x4000
+    bne st660_done
+
+    ldr r5, =0xfffb0c00
+    ldr r0, [r5, #0x24]
+    str r0, [r10, #0x14]
+    ldr r0, [r5, #0x2c]
+    str r0, [r10, #0x18]
+    ldr r0, [r5, #0x30]
+    str r0, [r10, #0x1c]
+    ldr r0, [r5, #0x2c]
+    tst r0, #3
+    bne st660_timeout
+
+    ldr r0, [r5, #0x24]
+    ldr r2, =0xffffffe1
+    and r0, r0, r2
+    orr r0, r0, #0x0a
+    str r0, [r5, #0x24]
+
+    bl delay660_1503
+    ldr r0, =0xfffbe42c
+    ldr r0, [r0]
+    str r0, [r10, #0x10]
+    tst r0, #0x4000
+    bne st660_done
+
+    bl cs660_assert
+    ldr r6, =xy660_cmds
+    add r7, r10, #2
+    bl read_pair660
+    mov r8, r0
+    bl cs660_release
+    bl delay660_63
+    cmp r8, #0
+    bne st660_timeout
+
+    ldr r0, =0xfffbe42c
+    ldr r0, [r0]
+    str r0, [r10, #0x10]
+    tst r0, #0x4000
+    bne st660_lost
+
+    bl cs660_assert
+    ldr r6, =z660_cmds
+    add r7, r10, #6
+    bl read_pair660
+    mov r8, r0
+    bl cs660_release
+    cmp r8, #0
+    bne st660_timeout
+
+    mov r0, #1
+    strh r0, [r10, #0x20]
+    strh r0, [r10, #0]
+
+    ldrh r0, [r10, #6]
+    and r0, r0, #0xff
+    strh r0, [r10, #6]
+    ldrh r0, [r10, #8]
+    and r0, r0, #0xff
+    strh r0, [r10, #8]
+    ldrh r0, [r10, #6]
+    strh r0, [r10, #0xa]
+
+    ldrh r4, [r10, #2]
+    ldrh r5, [r10, #4]
+    ldr r1, =131490
+    mul r0, r4, r1
+    ldr r1, =-5221
+    mla r0, r5, r1, r0
+    ldr r1, =-742272
+    add r0, r0, r1
+    mov r0, r0, asr #16
+    cmp r0, #0
+    movlt r0, #0
+    ldr r1, =479
+    cmp r0, r1
+    movgt r0, r1
+    strh r0, [r10, #0xc]
+
+    ldr r1, =248
+    mul r0, r4, r1
+    ldr r1, =-80924
+    mla r0, r5, r1, r0
+    ldr r1, =19211884
+    add r0, r0, r1
+    mov r0, r0, asr #16
+    cmp r0, #0
+    movlt r0, #0
+    ldr r1, =271
+    cmp r0, r1
+    movgt r0, r1
+    strh r0, [r10, #0xe]
+    b st660_done
+
+st660_lost:
+    mov r0, #2
+    strh r0, [r10, #0]
+    b st660_done
+st660_timeout:
+    mov r0, #3
+    strh r0, [r10, #0]
+st660_done:
+    ldmfd sp!, {r4-r11, pc}
+
+read_pair660:
+    stmfd sp!, {r4-r8, r11, lr}
+    mov r4, #0
+    mov r11, #0
+rp660_loop:
+    ldrb r1, [r6, r4]
+    cmp r1, #0
+    beq rp660_read
+    bl spi660_cmd
+    cmp r0, #0
+    bne rp660_fail
+    b rp660_next
+rp660_read:
+    bl spi660_read
+    cmp r1, #0
+    bne rp660_fail
+    cmp r4, #4
+    beq rp660_first
+    cmp r4, #10
+    beq rp660_first
+    cmp r4, #5
+    beq rp660_axis1
+    cmp r4, #11
+    beq rp660_axis2
+    b rp660_next
+rp660_first:
+    mov r11, r0
+    b rp660_next
+rp660_axis1:
+    mov r1, r11, lsl #1
+    orr r1, r1, r0, lsr #7
+    strh r1, [r7]
+    b rp660_next
+rp660_axis2:
+    mov r1, r11, lsl #1
+    orr r1, r1, r0, lsr #7
+    strh r1, [r7, #2]
+rp660_next:
+    add r4, r4, #1
+    cmp r4, #12
+    bne rp660_loop
+    mov r0, #0
+    ldmfd sp!, {r4-r8, r11, pc}
+rp660_fail:
+    mov r0, #1
+    ldmfd sp!, {r4-r8, r11, pc}
+
+spi660_cmd:
+    str r1, [r5, #0x34]
+    ldr r0, [r5, #0x2c]
+    ldr r2, =0xfffffc03
+    and r0, r0, r2
+    orr r0, r0, #0x3e
+    str r0, [r5, #0x2c]
+    mov r3, #0x1000
+spc660_wait:
+    ldr r0, [r5, #0x30]
+    tst r0, #2
+    bne spc660_ok
+    subs r3, r3, #1
+    bne spc660_wait
+    mov r0, #1
+    bx lr
+spc660_ok:
+    mov r0, #0
+    bx lr
+
+spi660_read:
+    ldr r0, [r5, #0x38]
+    mov r0, #0
+    str r0, [r5, #0x34]
+    ldr r0, [r5, #0x2c]
+    ldr r2, =0xfffffc03
+    and r0, r0, r2
+    orr r0, r0, #0x1d
+    str r0, [r5, #0x2c]
+    mov r3, #0x1000
+spr660_wait:
+    ldr r0, [r5, #0x30]
+    tst r0, #1
+    bne spr660_ok
+    subs r3, r3, #1
+    bne spr660_wait
+    mov r0, #0
+    mov r1, #1
+    bx lr
+spr660_ok:
+    ldr r0, [r5, #0x38]
+    and r0, r0, #255
+    mov r1, #0
+    bx lr
+
+cs660_assert:
+    ldr r0, =0xfffbe4b0
+    mov r1, #2
+    str r1, [r0]
+    bx lr
+
+cs660_release:
+    ldr r0, =0xfffbe4f0
+    mov r1, #2
+    str r1, [r0]
+    bx lr
+
+delay660_1503:
+    ldr r0, =0xfffec700
+    ldr r1, [r0, #8]
+    ldr r3, =0x5df
+    ldr r12, =0x00100000
+d660a_poll:
+    ldr r2, [r0, #8]
+    sub r2, r1, r2
+    cmp r2, r3
+    bhs d660a_done
+    subs r12, r12, #1
+    bne d660a_poll
+d660a_done:
+    bx lr
+
+delay660_63:
+    ldr r0, =0xfffec700
+    ldr r1, [r0, #8]
+    mov r3, #0x3f
+    ldr r12, =0x00100000
+d660b_poll:
+    ldr r2, [r0, #8]
+    sub r2, r1, r2
+    cmp r2, r3
+    bhs d660b_done
+    subs r12, r12, #1
+    bne d660b_poll
+d660b_done:
+    bx lr
+
 park:
     b park
 
@@ -629,7 +1082,7 @@ font:
     .byte 8,112,67,69,73,81,97,0,0,0,0,0,0,0,0,0
     .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-str_title:  .asciz "660 490"
+str_title:  .asciz "660 TOUCH HUD"
 str_frame:  .asciz "FR:"
 str_dma:    .asciz "DMA"
 str_lcd:    .asciz "LCD"
@@ -646,4 +1099,39 @@ str_mpu:    .asciz "MPU"
 str_note:   .asciz "TOGGLE PWR SW: WATCH GPIO/MPU BITS"
 str_exit:   .asciz "500 REACHED. IDLE LOW-CPU. HOLD PWR SW."
 str_exit2:  .asciz "NO OS RETURN/POWEROFF PATH VERIFIED."
+str_stat:   .asciz "STAT"
+str_pen:    .asciz "PEN"
+str_smp:    .asciz "SMP"
+str_z1:     .asciz "Z1"
+str_z2:     .asciz "Z2"
+str_cx:     .asciz "CX"
+str_cy:     .asciz "CY"
+str_cfg:    .asciz "CFG"
+str_ctl:    .asciz "CTL"
+str_spi:    .asciz "SPI"
+str_penr:   .asciz "PENR"
+str_note2:  .asciz "TSC2046 D9/99/B9/C9 PD01 DEF CAL"
+str_note3:  .asciz "NO OS CALLS; REMOVE SD BEFORE RESET"
+    .balign 4
+touch_vals:
+    .hword 0
+    .hword 0
+    .hword 0
+    .hword 0
+    .hword 0
+    .hword 0
+    .hword 0
+    .hword 0
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .hword 0
+    .hword 0
+sample_count:
+    .word 0
+xy660_cmds:
+    .byte 0xd9,0,0,0xd9,0,0,0x99,0,0,0x99,0,0
+z660_cmds:
+    .byte 0xb9,0,0,0xb9,0,0,0xc9,0,0,0xc9,0,0
     .balign 4
