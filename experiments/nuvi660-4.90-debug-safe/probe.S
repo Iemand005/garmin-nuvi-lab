@@ -63,9 +63,6 @@ known:
 
 main_loop:
     add r8, r8, #1
-    ldr r0, =BG
-    bl fill_screen
-
     mov r2, #2
     mov r3, #2
     ldr r1, =FG2
@@ -90,7 +87,7 @@ main_loop:
     bl draw_string
     mov r2, #38
     mov r3, #12
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_ds
     bl draw_string
     ldr r7, =DMA_BASE
@@ -103,7 +100,7 @@ main_loop:
     bl draw_hex32
     mov r2, #152
     mov r3, #12
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_de
     bl draw_string
     ldrh r0, [r7, #12]
@@ -115,7 +112,7 @@ main_loop:
     bl draw_hex32
     mov r2, #266
     mov r3, #12
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_dl
     bl draw_string
     ldrh r4, [r7, #8]
@@ -138,7 +135,7 @@ main_loop:
     bl draw_string
     mov r2, #38
     mov r3, #22
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_l0
     bl draw_string
     ldr r0, =0xfffec000
@@ -149,7 +146,7 @@ main_loop:
     bl draw_hex32
     mov r2, #176
     mov r3, #22
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_l4
     bl draw_string
     ldr r0, =0xfffec004
@@ -167,7 +164,7 @@ main_loop:
     bl draw_string
     mov r2, #38
     mov r3, #32
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_a14
     bl draw_string
     ldr r0, =0xfffe6014
@@ -178,7 +175,7 @@ main_loop:
     bl draw_hex16
     mov r2, #122
     mov r3, #32
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_a18
     bl draw_string
     ldr r0, =0xfffe6018
@@ -189,7 +186,7 @@ main_loop:
     bl draw_hex16
     mov r2, #206
     mov r3, #32
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_a34
     bl draw_string
     ldr r0, =0xfffe6034
@@ -200,7 +197,7 @@ main_loop:
     bl draw_hex16
     mov r2, #290
     mov r3, #32
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_tm
     bl draw_string
     ldr r0, =0xfffec708
@@ -218,7 +215,7 @@ main_loop:
     bl draw_string
     mov r2, #38
     mov r3, #44
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_bc430
     bl draw_string
     ldr r0, =0xfffbc430
@@ -229,7 +226,7 @@ main_loop:
     bl draw_hex32
     mov r2, #182
     mov r3, #44
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_cc30
     bl draw_string
     ldr r0, =0xfffbcc30
@@ -246,7 +243,7 @@ main_loop:
     bl draw_string
     mov r2, #38
     mov r3, #54
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_be430
     bl draw_string
     ldr r0, =0xfffbe430
@@ -257,7 +254,7 @@ main_loop:
     bl draw_hex32
     mov r2, #182
     mov r3, #54
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_bec30
     bl draw_string
     ldr r0, =0xfffbec30
@@ -274,7 +271,7 @@ main_loop:
     bl draw_string
     mov r2, #38
     mov r3, #64
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_bec2c
     bl draw_string
     ldr r0, =0xfffbec2c
@@ -285,7 +282,7 @@ main_loop:
     bl draw_hex32
     mov r2, #182
     mov r3, #64
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_be42c
     bl draw_string
     ldr r0, =0xfffbe42c
@@ -305,7 +302,7 @@ main_loop:
     mov r6, r0
     mov r2, #38
     mov r3, #76
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_tx
     bl draw_string
     mov r0, r4
@@ -315,7 +312,7 @@ main_loop:
     bl draw_hex16
     mov r2, #98
     mov r3, #76
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_ty
     bl draw_string
     mov r0, r5
@@ -325,7 +322,7 @@ main_loop:
     bl draw_hex16
     mov r2, #158
     mov r3, #76
-    ldr r1, =FG
+    ldr r1, =FG2
     ldr r0, =str_tp
     bl draw_string
     mov r0, r6
@@ -333,54 +330,7 @@ main_loop:
     mov r3, #76
     ldr r1, =FG3
     bl draw_hex16
-    mov r2, #218
-    mov r3, #76
-    ldr r1, =FG
-    ldr r0, =str_spi
-    bl draw_string
-    ldr r0, =0xfffb0c18
-    ldr r0, [r0]
-    mov r2, #242
-    mov r3, #76
-    ldr r1, =FG3
-    bl draw_hex32
 
-    /* CHG XOR */
-    mov r2, #2
-    mov r3, #88
-    ldr r1, =FG2
-    ldr r0, =str_chg
-    bl draw_string
-    ldr r0, =0xfffbec2c
-    ldr r4, [r0]
-    ldr r5, =prev_gpc
-    ldr r6, [r5]
-    str r4, [r5]
-    eor r0, r4, r6
-    mov r2, #38
-    mov r3, #88
-    ldr r1, =FG3
-    bl draw_hex32
-    ldr r0, =0xfffbe42c
-    ldr r4, [r0]
-    ldr r5, =prev_gpb
-    ldr r6, [r5]
-    str r4, [r5]
-    eor r0, r4, r6
-    mov r2, #136
-    mov r3, #88
-    ldr r1, =FG3
-    bl draw_hex32
-    ldr r0, =0xfffb5008
-    ldr r4, [r0]
-    ldr r5, =prev_mpu
-    ldr r6, [r5]
-    str r4, [r5]
-    eor r0, r4, r6
-    mov r2, #234
-    mov r3, #88
-    ldr r1, =FG3
-    bl draw_hex32
 
     mov r2, #2
     mov r3, #102
