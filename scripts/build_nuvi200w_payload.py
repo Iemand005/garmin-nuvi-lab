@@ -200,6 +200,11 @@ def build_with_pools(items, equ, ks, out_dir: Path, name: str):
                 n = eval_expr(val.split(None,1)[1], pc, labels)
                 stream.append((pc, 'space_n', n))
                 pc += n
+            elif op in ('.byte', '.ascii', '.asciz', '.string'):
+                enc, _cnt = ks.asm(val, pc)
+                raw = bytes(enc)
+                stream.append((pc, 'raw_bytes', raw))
+                pc += len(raw)
             elif op == '.ltorg':
                 # emit pending literals
                 if pending:
@@ -362,6 +367,8 @@ def build_with_pools(items, equ, ks, out_dir: Path, name: str):
                 out.extend(struct.pack('<H', eval_expr(a, pc_i) & 0xFFFF)); cur += 2
         elif kind == 'space_n':
             out.extend(b'\x00'*val); cur += val
+        elif kind == 'raw_bytes':
+            out.extend(val); cur += len(val)
         else:
             raise SystemExit(f'unhandled {kind} {val} at {pc_i:#x}')
 
