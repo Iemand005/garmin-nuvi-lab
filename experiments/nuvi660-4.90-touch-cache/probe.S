@@ -1,6 +1,7 @@
-/* nüvi 660 (HWID 596, SW 4.90) - SAFE debug HUD.
+/* nüvi 660 (HWID 596, SW 4.90) - SAFE debug HUD with touch.
  * LOCAL EXPERIMENT. No GPIO writes, no ADC writes, no unknown MMIO reads.
- * Only reads DMA/LCD regs and renders debug text to framebuffer.
+ * Reads the firmware touch cache at 0x10ac15c4..0x10ac15cc and displays
+ * X, Y and pressed flag in the existing HUD.
  * Remove SD before recovery reset.
  */
 .syntax unified
@@ -23,6 +24,12 @@
 .equ FG,       0xFFFF
 .equ FG2,      0x07E0
 .equ FG3,      0xFFE0
+.equ TOUCH_CACHE, 0x10ac15c4
+.equ TOUCH_X,    0x10ac15ca
+.equ TOUCH_Y,    0x10ac15cc
+.equ TOUCH_PRESSED, 0x10ac15c4
+; touch_vals array used by the HUD (same layout as the touch‑hud experiment)
+.equ TOUCH_VALS, 0x1004126c
 
 probe_start:
     b entry
