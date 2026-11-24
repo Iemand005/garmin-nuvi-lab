@@ -225,14 +225,14 @@ main_loop:
 
     ; read touch cache into touch_vals
     ldr r0, =TOUCH_X
-    ldrh r0, [r0]
-    strh r0, [TOUCH_VALS]
+    ldr r0, [r0]
+    str r0, [TOUCH_VALS]
     ldr r0, =TOUCH_Y
-    ldrh r0, [r0]
-    strh r0, [TOUCH_VALS + 2]
+    ldr r0, [r0]
+    str r0, [TOUCH_VALS + 2]
     ldr r0, =TOUCH_PRESSED
-    ldrb r0, [r0]
-    strh r0, [TOUCH_VALS + 4]
+    ldr r0, [r0]
+    str r0, [TOUCH_VALS + 4]
 
     mov r2, #2
     mov r3, #62
