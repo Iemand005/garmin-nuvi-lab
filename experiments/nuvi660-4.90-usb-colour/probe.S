@@ -476,7 +476,7 @@ scratch:
 
     .balign 4
 usb_device:
-    .byte 18,1,0x00,2,0,0,0,64,0x1e,9,0xfc,0xff,1,0,0,0,0,1
+    .byte 18,1,0x00,2,0,0,0,64,0x09,0x12,0xfc,0xff,1,0,0,0,0,1
 usb_configuration:
     .byte 9,2,32,0,1,1,0,0x80,250
     .byte 9,4,0,0,2,0xff,0,0,0
