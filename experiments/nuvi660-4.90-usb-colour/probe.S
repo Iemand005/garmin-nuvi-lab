@@ -243,16 +243,18 @@ usb_vendor_next:
     b usb_stall
 
 usb_descriptor:
-    cmp r2, #0
-    bne usb_stall
     cmp r1, #0x100
     bne usb_desc_config
+    cmp r2, #0
+    bne usb_stall
     ldr r0, =STAGE + (usb_device - probe_start)
     mov r1, #18
     b usb_send
 usb_desc_config:
     cmp r1, #0x200
     bne usb_desc_os_string
+    cmp r2, #0
+    bne usb_stall
     ldr r0, =STAGE + (usb_configuration - probe_start)
     mov r1, #32
     b usb_send
@@ -460,7 +462,7 @@ scratch:
 
     .balign 4
 usb_device:
-    .byte 18,1,0x00,2,0,0,0,64,0x1e,9,0xfe,0xff,2,0,0,0,0,1
+    .byte 18,1,0x00,2,0,0,0,64,0x1e,9,0xfd,0xff,1,0,0,0,0,1
 usb_configuration:
     .byte 9,2,32,0,1,1,0,0x80,250
     .byte 9,4,0,0,2,0xff,0,0,0

@@ -1,8 +1,8 @@
 """Set nüvi 660 display color over private USB vendor request 0x51.
 
-Requires pyusb and a libusb/WinUSB backend bound to VID 091e PID fffe.
+Requires pyusb and a libusb/WinUSB backend bound to VID 091e PID fffd.
 Install with: .venv\\Scripts\\pip.exe install pyusb
-On Windows, bind the device with Zadig (WinUSB or libusbK) first.
+On Windows 8+ the WCID descriptors load in-box WinUSB automatically.
 """
 
 import argparse
@@ -51,7 +51,7 @@ def main():
     parser.add_argument("color", nargs="?", help="rrggbb, 0xRRRR, r,g,b, or name")
     parser.add_argument("--list", action="store_true", help="list Garmin USB devices")
     parser.add_argument("--vendor", type=lambda x: int(x, 0), default=0x091E)
-    parser.add_argument("--product", type=lambda x: int(x, 0), default=0xFFFE)
+    parser.add_argument("--product", type=lambda x: int(x, 0), default=0xFFFD)
     args = parser.parse_args()
 
     try:
