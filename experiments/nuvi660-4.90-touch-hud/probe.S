@@ -1,6 +1,6 @@
-/* nüvi 660 Euro (HWID 596, SW 4.90) - TSC2046 touch input HUD.
- * LOCAL EXPERIMENT. Reads the touch controller on SPI, writes only the
- * framebuffer, and never calls the OS or stock touch task.
+/* nüvi 660 Euro (HWID 596, SW 4.90) - touch cache HUD.
+ * LOCAL EXPERIMENT. Read-only observer of the firmware touch cache at
+ * 0x10ac15c4..0x10ac15cc. No SPI/GPIO writes, so it cannot hang the device.
  * Remove SD before recovery reset.
  */
 .syntax unified
@@ -681,12 +681,7 @@ touch_hud_loop:
     ldr r0, [r10]
     add r0, r0, #1
     str r0, [r10]
-    bl sample_touch660
     bl update_touch_hud
-    ldr r12, =0x00080000
-th_delay:
-    subs r12, r12, #1
-    bne th_delay
     b touch_hud_loop
 
 update_touch_hud:
@@ -774,129 +769,6 @@ update_touch_hud:
 
     ldmfd sp!, {r4-r10, pc}
 
-sample_touch660:
-    stmfd sp!, {r4-r11, lr}
-    ldr r10, =touch_vals
-    mov r0, #0
-    strh r0, [r10, #0]
-    strh r0, [r10, #2]
-    strh r0, [r10, #4]
-    strh r0, [r10, #6]
-    strh r0, [r10, #8]
-    strh r0, [r10, #0xa]
-    strh r0, [r10, #0xc]
-    strh r0, [r10, #0xe]
-    strh r0, [r10, #0x20]
-
-    ldr r0, =0xfffbe42c
-    ldr r0, [r0]
-    str r0, [r10, #0x10]
-    tst r0, #0x4000
-    bne st660_done
-
-    ldr r5, =0xfffb0c00
-    ldr r0, [r5, #0x24]
-    str r0, [r10, #0x14]
-    ldr r0, [r5, #0x2c]
-    str r0, [r10, #0x18]
-    ldr r0, [r5, #0x30]
-    str r0, [r10, #0x1c]
-    ldr r0, [r5, #0x2c]
-    tst r0, #3
-    bne st660_timeout
-
-    ldr r0, [r5, #0x24]
-    ldr r2, =0xffffffe1
-    and r0, r0, r2
-    orr r0, r0, #0x0a
-    str r0, [r5, #0x24]
-
-    bl delay660_1503
-    ldr r0, =0xfffbe42c
-    ldr r0, [r0]
-    str r0, [r10, #0x10]
-    tst r0, #0x4000
-    bne st660_done
-
-    bl cs660_assert
-    ldr r6, =xy660_cmds
-    add r7, r10, #2
-    bl read_pair660
-    mov r8, r0
-    bl cs660_release
-    bl delay660_63
-    cmp r8, #0
-    bne st660_timeout
-
-    ldr r0, =0xfffbe42c
-    ldr r0, [r0]
-    str r0, [r10, #0x10]
-    tst r0, #0x4000
-    bne st660_lost
-
-    bl cs660_assert
-    ldr r6, =z660_cmds
-    add r7, r10, #6
-    bl read_pair660
-    mov r8, r0
-    bl cs660_release
-    cmp r8, #0
-    bne st660_timeout
-
-    mov r0, #1
-    strh r0, [r10, #0x20]
-    strh r0, [r10, #0]
-
-    ldrh r0, [r10, #6]
-    and r0, r0, #0xff
-    strh r0, [r10, #6]
-    ldrh r0, [r10, #8]
-    and r0, r0, #0xff
-    strh r0, [r10, #8]
-    ldrh r0, [r10, #6]
-    strh r0, [r10, #0xa]
-
-    ldrh r4, [r10, #2]
-    ldrh r5, [r10, #4]
-    ldr r1, =131490
-    mul r0, r4, r1
-    ldr r1, =-5221
-    mla r0, r5, r1, r0
-    ldr r1, =-742272
-    add r0, r0, r1
-    mov r0, r0, asr #16
-    cmp r0, #0
-    movlt r0, #0
-    ldr r1, =479
-    cmp r0, r1
-    movgt r0, r1
-    strh r0, [r10, #0xc]
-
-    ldr r1, =248
-    mul r0, r4, r1
-    ldr r1, =-80924
-    mla r0, r5, r1, r0
-    ldr r1, =19211884
-    add r0, r0, r1
-    mov r0, r0, asr #16
-    cmp r0, #0
-    movlt r0, #0
-    ldr r1, =271
-    cmp r0, r1
-    movgt r0, r1
-    strh r0, [r10, #0xe]
-    b st660_done
-
-st660_lost:
-    mov r0, #2
-    strh r0, [r10, #0]
-    b st660_done
-st660_timeout:
-    mov r0, #3
-    strh r0, [r10, #0]
-st660_done:
-    ldmfd sp!, {r4-r11, pc}
-
 read_pair660:
     stmfd sp!, {r4-r8, r11, lr}
     mov r4, #0
@@ -945,6 +817,11 @@ rp660_fail:
     ldmfd sp!, {r4-r8, r11, pc}
 
 spi660_cmd:
+    ldr r0, [r5, #0x24]
+    ldr r2, =0xffffffe1
+    and r0, r0, r2
+    orr r0, r0, #0x0a
+    str r0, [r5, #0x24]
     str r1, [r5, #0x34]
     ldr r0, [r5, #0x2c]
     ldr r2, =0xfffffc03
@@ -965,6 +842,11 @@ spc660_ok:
     bx lr
 
 spi660_read:
+    ldr r0, [r5, #0x24]
+    ldr r2, =0xffffffe1
+    and r0, r0, r2
+    orr r0, r0, #0x0a
+    str r0, [r5, #0x24]
     ldr r0, [r5, #0x38]
     mov r0, #0
     str r0, [r5, #0x34]
@@ -1110,8 +992,8 @@ str_cfg:    .asciz "CFG"
 str_ctl:    .asciz "CTL"
 str_spi:    .asciz "SPI"
 str_penr:   .asciz "PENR"
-str_note2:  .asciz "TSC2046 D9/99/B9/C9 PD01 DEF CAL"
-str_note3:  .asciz "NO OS CALLS; REMOVE SD BEFORE RESET"
+str_note2:  .asciz "READ-ONLY TOUCH CACHE 10AC15C4"
+str_note3:  .asciz "NO HW WRITES; REMOVE SD BEFORE RESET"
     .balign 4
 touch_vals:
     .hword 0
