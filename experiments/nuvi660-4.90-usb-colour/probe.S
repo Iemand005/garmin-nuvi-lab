@@ -220,9 +220,15 @@ usb_no_rx:
     cmp r0, r4
     bne usb_vendor_next
     cmp r2, #4
-    bne usb_stall
+    bne usb_vendor_20
     ldr r0, =STAGE + (ms_compat_id - probe_start)
     mov r1, #40
+    b usb_send
+usb_vendor_20:
+    cmp r2, #7
+    bne usb_stall
+    ldr r0, =STAGE + (usb_msos20 - probe_start)
+    mov r1, #30
     b usb_send
 usb_vendor_next:
     ldr r4, =0x0102
@@ -243,6 +249,14 @@ usb_vendor_next:
     b usb_stall
 
 usb_descriptor:
+    cmp r1, #0x00f
+    bne usb_desc_device
+    cmp r2, #0
+    bne usb_stall
+    ldr r0, =STAGE + (usb_bos - probe_start)
+    mov r1, #33
+    b usb_send
+usb_desc_device:
     cmp r1, #0x100
     bne usb_desc_config
     cmp r2, #0
@@ -462,12 +476,25 @@ scratch:
 
     .balign 4
 usb_device:
-    .byte 18,1,0x00,2,0,0,0,64,0x1e,9,0xfd,0xff,1,0,0,0,0,1
+    .byte 18,1,0x00,2,0,0,0,64,0x1e,9,0xfc,0xff,1,0,0,0,0,1
 usb_configuration:
     .byte 9,2,32,0,1,1,0,0x80,250
     .byte 9,4,0,0,2,0xff,0,0,0
     .byte 7,5,0x81,2,64,0,0
     .byte 7,5,0x01,2,64,0,0
+usb_bos:
+    .byte 5,0x0f,33,0,1
+    .byte 28,0x10,5,0
+    .byte 0xdf,0x60,0xdd,0xd8,0x89,0x45,0xc7,0x4c
+    .byte 0x9c,0xd2,0x65,0x9d,0x9e,0x64,0x8a,0x9f
+    .byte 0,0,3,6
+    .byte 30,0
+    .byte 0x6b,0
+usb_msos20:
+    .byte 10,0,0,0,0,0,3,6,30,0
+    .byte 20,0,3,0
+    .ascii "WINUSB"
+    .byte 0,0,0,0,0,0,0,0,0,0
 ms_os_string:
     .byte 18,3
     .byte 0x4d,0,0x53,0,0x46,0,0x54,0,0x31,0,0x30,0,0x30,0
