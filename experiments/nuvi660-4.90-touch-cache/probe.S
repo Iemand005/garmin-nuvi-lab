@@ -223,17 +223,6 @@ main_loop:
     ldr r1, =FG3
     bl draw_hex32
 
-    ; read touch cache into touch_vals
-    ldr r0, =TOUCH_X
-    ldr r0, [r0]
-    str r0, [TOUCH_VALS]
-    ldr r0, =TOUCH_Y
-    ldr r0, [r0]
-    str r0, [TOUCH_VALS + 2]
-    ldr r0, =TOUCH_PRESSED
-    ldr r0, [r0]
-    str r0, [TOUCH_VALS + 4]
-
     mov r2, #2
     mov r3, #62
     ldr r1, =FG2
@@ -258,23 +247,44 @@ main_loop:
     ldr r1, =FG3
     bl draw_hex32
 
-    /* Touch: read-only BE434 bit19 touch detect */
+    /* Touch position from firmware touch_get */
+    ldr r0, =TOUCH_VALS
+    ldr r3, =0x100e8f59
+    blx r3
+    ldr r0, =TOUCH_VALS
+    ldrh r5, [r0]
+    ldrh r6, [r0, #2]
+    ldrb r4, [r0, #4]
+
     mov r2, #2
     mov r3, #72
     ldr r1, =FG2
-    ldr r0, =str_tch
+    ldr r0, =str_tx
     bl draw_string
-    ldr r0, =0xfffbe434
-    ldr r4, [r0]
-    mov r0, r4
-    mov r2, #38
+    mov r0, r5
+    mov r2, #14
     mov r3, #72
     ldr r1, =FG3
-    bl draw_hex32
-    mov r0, r4, lsr #19
-    and r0, r0, #1
-    eor r0, r0, #1          /* 1=touched */
-    mov r2, #136
+    bl draw_hex16
+
+    mov r2, #110
+    mov r3, #72
+    ldr r1, =FG2
+    ldr r0, =str_ty
+    bl draw_string
+    mov r0, r6
+    mov r2, #122
+    mov r3, #72
+    ldr r1, =FG3
+    bl draw_hex16
+
+    mov r2, #220
+    mov r3, #72
+    ldr r1, =FG2
+    ldr r0, =str_tp
+    bl draw_string
+    mov r0, r4
+    mov r2, #232
     mov r3, #72
     ldr r1, =FG3
     bl draw_hex16
