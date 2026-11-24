@@ -21,9 +21,9 @@
 
 probe_start:
     b entry
-    .word STAGE + (footer - probe_start)
-    .word STAGE + (hwid - probe_start)
-    .word STAGE + (version - probe_start)
+    .word STAGE + (footer - probe_start) + 8
+    .word STAGE + (hwid - probe_start) + 8
+    .word STAGE + (version - probe_start) + 8
 
 entry:
     cmp r12, #2
