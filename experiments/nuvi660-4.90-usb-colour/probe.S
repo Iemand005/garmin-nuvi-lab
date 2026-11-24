@@ -350,7 +350,6 @@ usb_stall:
 usb_return:
     bx lr
 
-    .ltorg
     .balign 4
 hwid:    .hword 596
 version: .hword 490
@@ -429,3 +428,4 @@ usb_configuration:
     .byte 9,2,18,0,1,1,0,0x80,250
     .byte 9,4,0,0,0,0xff,0,0,0
     .balign 4
+    .ltorg
