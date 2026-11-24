@@ -28,7 +28,6 @@
 .equ TOUCH_X,    0x10ac15ca
 .equ TOUCH_Y,    0x10ac15cc
 .equ TOUCH_PRESSED, 0x10ac15c4
-; touch_vals array used by the HUD (same layout as the touch‑hud experiment)
 .equ TOUCH_VALS, 0x1004126c
 
 probe_start:
@@ -223,6 +222,17 @@ main_loop:
     mov r3, #52
     ldr r1, =FG3
     bl draw_hex32
+
+    ; read touch cache into touch_vals
+    ldr r0, =TOUCH_X
+    ldrh r0, [r0]
+    strh r0, [TOUCH_VALS]
+    ldr r0, =TOUCH_Y
+    ldrh r0, [r0]
+    strh r0, [TOUCH_VALS + 2]
+    ldr r0, =TOUCH_PRESSED
+    ldrb r0, [r0]
+    strh r0, [TOUCH_VALS + 4]
 
     mov r2, #2
     mov r3, #62
