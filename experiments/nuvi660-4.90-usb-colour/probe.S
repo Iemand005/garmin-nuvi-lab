@@ -21,9 +21,9 @@
 
 probe_start:
     b entry
-    .word STAGE + (footer - probe_start) + 8
-    .word STAGE + (hwid - probe_start) + 8
-    .word STAGE + (version - probe_start) + 8
+    .word STAGE + (footer - probe_start)
+    .word STAGE + (hwid - probe_start)
+    .word STAGE + (version - probe_start)
 
 entry:
     cmp r12, #2
@@ -223,14 +223,16 @@ usb_descriptor:
     cmp r2, #0
     bne usb_stall
     cmp r1, #0x100
-    ldreq r0, =STAGE + (usb_device - probe_start)
-    moveq r1, #18
-    beq usb_send
+    bne usb_desc_config
+    ldr r0, =STAGE + (usb_device - probe_start)
+    mov r1, #18
+    b usb_send
+usb_desc_config:
     cmp r1, #0x200
-    ldreq r0, =STAGE + (usb_configuration - probe_start)
-    moveq r1, #18
-    beq usb_send
-    b usb_stall
+    bne usb_stall
+    ldr r0, =STAGE + (usb_configuration - probe_start)
+    mov r1, #18
+    b usb_send
 usb_set_config:
     cmp r2, #0
     bne usb_stall
