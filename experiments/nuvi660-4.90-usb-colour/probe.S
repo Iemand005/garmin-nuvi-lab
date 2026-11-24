@@ -61,7 +61,7 @@ known:
     moveq r0, #0x001F
     movne r0, #0xF800
     strh r0, [r8, #COLOR_OFF]
-    mov r0, #0xFFFF
+    ldr r0, =0xFFFF
     strh r0, [r8, #LAST_OFF]
     b main_loop
 

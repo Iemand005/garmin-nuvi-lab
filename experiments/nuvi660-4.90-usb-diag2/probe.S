@@ -58,7 +58,7 @@ known:
     bne park
 
     add r9, r4, #PIXHDR
-    mov r0, #BG
+    ldr r0, =BG
     bl fill_screen
     bl usb_init
 
