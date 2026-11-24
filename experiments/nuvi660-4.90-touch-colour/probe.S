@@ -66,17 +66,20 @@ main_loop:
     cmp r7, #0
     beq fill_black
 
-    /* RGB565: R = x>>5, G = y>>4, B = (x+y)>>6 */
-    lsr r0, r5, #5
-    and r0, r0, #0x1F
+    /* Brighter RGB565: R = min(31, x>>4), G = min(63, y>>3), B = min(31, (x+y)>>5) */
+    lsr r0, r5, #4
+    cmp r0, #0x1F
+    movgt r0, #0x1F
     lsl r0, r0, #11
-    lsr r1, r6, #4
-    and r1, r1, #0x3F
+    lsr r1, r6, #3
+    cmp r1, #0x3F
+    movgt r1, #0x3F
     lsl r1, r1, #5
     orr r0, r0, r1
     add r1, r5, r6
-    lsr r1, r1, #6
-    and r1, r1, #0x1F
+    lsr r1, r1, #5
+    cmp r1, #0x1F
+    movgt r1, #0x1F
     orr r0, r0, r1
     b do_fill
 
